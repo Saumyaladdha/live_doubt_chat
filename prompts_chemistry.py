@@ -835,8 +835,25 @@ RULES:
 - Use 3-4 numbered statements (not 2 — that belongs to Category A).
 - Each statement must require TWO-STEP thinking — not pure recall.
 - At least 1 statement must be FALSE (tricky but plausible).
-- Options must be SHORT combinations — never full statement text.
+- ALL statements (I), (II), (III), (IV) MUST be in the QUESTION STEM — NEVER in the options.
+- Options must be SHORT combinations ONLY — like "(I) and (II) only", "(I), (III) and (IV) only".
 - Can also ask "Which is/are INCORRECT?" for variety.
+
+FORMAT VIOLATION (INSTANT FAIL — REWRITE):
+BAD (statements inside options):
+(A) (I) and (II) only, where (I) Most common polyhedra are octahedral... (II) Coordination number is...
+(B) (II) and (III) only, where (III) Pi-bonds are counted...
+← WRONG: Statements are INSIDE the options. Student cannot read the question without reading all options.
+
+GOOD (statements in stem, options are short):
+Q. Which of the following statement(s) is/are correct?
+(I) Most common coordination polyhedra are octahedral, tetrahedral and square planar
+(II) Coordination number equals the number of sigma-bonded ligand donor atoms
+(III) Pi-bonds are counted while determining coordination number
+(IV) Square planar geometry is common for coordination number 4
+
+(A) (I) and (II) only  (B) (II) and (III) only  (C) (I), (II) and (IV) only  (D) All four
+← CORRECT: All statements in stem. Options are just short labels.
 
 NEET 2025 Example:
 Q. Which of the following statement(s) is/are correct?
@@ -2185,6 +2202,12 @@ NEVER ask unit definition / unit conversion questions.
 NO annotations/tags in parentheses inside items. Items must be CLEAN.
 BAD: "(definition)", "(formula given)", "(naming example)", "(as given)"
 GOOD: Just the chemistry term/formula — no parenthetical labels
+
+NO ANSWER-REVEALING LABELS IN LIST II (CRITICAL):
+List II items MUST NOT contain words/properties that directly appear in List I — this makes matching trivial.
+BAD: List I = "Yellow complex", "Green complex" / List II = "$[CoCl_2(NH_3)_4]$ (violet isomer)", "$[CoCl_2(NH_3)_4]$ (green isomer)" ← colour labels in List II match List I colours directly — student just matches colours without any chemistry.
+GOOD: List II = "$[CoCl_2(NH_3)_4]$ (cis-isomer)", "$[CoCl_2(NH_3)_4]$ (trans-isomer)" ← student must know cis = violet, trans = green — requires actual coordination chemistry knowledge.
+TEST: Do List II labels contain the SAME property (colour, name, category) that List I uses to distinguish items? If YES → the match is self-evident → REWRITE List II labels to use the underlying chemistry reason (isomerism type, structural feature, electronic cause).
 
 NO self-evident matching — student must use RECALLED KNOWLEDGE.
 
