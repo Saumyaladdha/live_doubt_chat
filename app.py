@@ -25,7 +25,7 @@ import streamlit as st
 import json
 
 from test_generator import generate_neet_test_from_pdf
-from excel_export import generate_excel_for_result, read_excel_for_review, update_excel_with_comments
+from excel_export import generate_excel_for_result, read_excel_for_review, update_excel_with_comments, latex_to_unicode
 
 # Page config
 st.set_page_config(
@@ -424,6 +424,7 @@ def _make_excel_filename(metadata: dict, page_count: int) -> str:
 
 def render_match_the_column(text: str):
     """Dedicated renderer for Match the Column questions. Handles all formats."""
+    text = latex_to_unicode(text)
     text = text.replace('\\n\\n', '\n\n').replace('\\n', '\n')
 
     prefix = ""
@@ -512,6 +513,7 @@ def render_match_the_column(text: str):
 
 def render_latex_text(text: str):
     """Render text that may contain LaTeX."""
+    text = latex_to_unicode(text)
     if '\\begin{tabular}' in text or 'begin{tabular}' in text:
         normalized = text.replace('\\\\', '\\')
         prefix_match = re.match(r'^(.*?)\\begin\{tabular\}', normalized, re.DOTALL)
@@ -655,7 +657,7 @@ def render_test_view(result: dict, generation_time: float = None):
         for idx, q in enumerate(questions):
             q_id = q.get('question_id', idx + 1)
             q_type = q.get('question_type', 'MCQ')
-            q_text = q.get('question_text', '')
+            q_text = latex_to_unicode(q.get('question_text', ''))
 
             type_labels = {
                 'MCQ': 'MCQ',
@@ -701,7 +703,7 @@ def render_test_view(result: dict, generation_time: float = None):
                 options = q["options"]
                 for key in ['a', 'b', 'c', 'd']:
                     if key in options:
-                        val = options[key]
+                        val = latex_to_unicode(options[key])
                         label = key.upper()
 
                         letter_col, text_col = st.columns([0.055, 0.945])
@@ -985,19 +987,19 @@ with tab_review:
                 </div>
                 """, unsafe_allow_html=True)
 
-                # Render question content by type
+                # Render question content by type (LaTeX cleaned to Unicode)
                 if qtype == "MCQ":
-                    st.markdown(f"**{q.get('question_text', '')}**")
+                    st.markdown(f"**{latex_to_unicode(q.get('question_text', ''))}**")
                     opts = q.get("options", {})
                     for key in ["a", "b", "c", "d"]:
                         if key in opts and opts[key]:
-                            st.markdown(f"- **{key.upper()}.** {opts[key]}")
+                            st.markdown(f"- **{key.upper()}.** {latex_to_unicode(opts[key])}")
                 elif qtype == "ASSERTION_REASON":
-                    st.markdown(f"**Assertion (A):** {q.get('assertion', '')}")
-                    st.markdown(f"**Reason (R):** {q.get('reason', '')}")
+                    st.markdown(f"**Assertion (A):** {latex_to_unicode(q.get('assertion', ''))}")
+                    st.markdown(f"**Reason (R):** {latex_to_unicode(q.get('reason', ''))}")
                 elif qtype == "MATCH_THE_COLUMN":
-                    st.markdown(f"**List I:** {q.get('list_i', '')}")
-                    st.markdown(f"**List II:** {q.get('list_ii', '')}")
+                    st.markdown(f"**List I:** {latex_to_unicode(q.get('list_i', ''))}")
+                    st.markdown(f"**List II:** {latex_to_unicode(q.get('list_ii', ''))}")
 
                 # Correct answer
                 answer = q.get("correct_answer", "")

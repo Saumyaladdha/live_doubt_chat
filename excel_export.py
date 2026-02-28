@@ -11,32 +11,108 @@ from openpyxl.styles import Font, Alignment, PatternFill, Border, Side
 
 
 # ============================================================
+# LATEX → UNICODE CONVERSION
+# ============================================================
+
+_SUP = {'0': '\u2070', '1': '\u00b9', '2': '\u00b2', '3': '\u00b3', '4': '\u2074',
+        '5': '\u2075', '6': '\u2076', '7': '\u2077', '8': '\u2078', '9': '\u2079',
+        '+': '\u207a', '-': '\u207b', 'n': '\u207f', '(': '\u207d', ')': '\u207e'}
+
+_SUB = {'0': '\u2080', '1': '\u2081', '2': '\u2082', '3': '\u2083', '4': '\u2084',
+        '5': '\u2085', '6': '\u2086', '7': '\u2087', '8': '\u2088', '9': '\u2089',
+        '+': '\u208a', '-': '\u208b', '(': '\u208d', ')': '\u208e',
+        'a': '\u2090', 'e': '\u2091', 'o': '\u2092', 'x': '\u2093',
+        'h': '\u2095', 'k': '\u2096', 'l': '\u2097', 'm': '\u2098',
+        'n': '\u2099', 'p': '\u209a', 's': '\u209b', 't': '\u209c'}
+
+_GREEK = {
+    'alpha': '\u03b1', 'beta': '\u03b2', 'gamma': '\u03b3', 'delta': '\u03b4',
+    'pi': '\u03c0', 'sigma': '\u03c3', 'lambda': '\u03bb', 'mu': '\u03bc',
+    'theta': '\u03b8', 'Delta': '\u0394',
+}
+
+
+def _to_superscript(s: str) -> str:
+    return ''.join(_SUP.get(c, c) for c in s)
+
+
+def _to_subscript(s: str) -> str:
+    return ''.join(_SUB.get(c, c) for c in s)
+
+
+def latex_to_unicode(text: str) -> str:
+    """Convert LaTeX math notation to clean Unicode text.
+    Handles: $...$, ^{}, _{}, \\alpha, \\Delta H, \\cdot, \\text{}, etc.
+    """
+    if not text:
+        return ""
+    text = str(text)
+
+    # Strip $ delimiters
+    text = re.sub(r'\$([^$]+)\$', r'\1', text)
+
+    # Remove \text{} and \mathrm{} wrappers
+    text = re.sub(r'\\(?:text|mathrm|textrm)\{([^}]*)\}', r'\1', text)
+
+    # Greek letters: \alpha → α
+    for name, char in _GREEK.items():
+        text = text.replace(f'\\{name}', char)
+
+    # \cdot → ·
+    text = text.replace('\\cdot', '\u00b7')
+
+    # ^\circ → ° (degree, often after E)
+    text = re.sub(r'\^\\circ', '\u00b0', text)
+    # standalone \circ → °
+    text = text.replace('\\circ', '\u00b0')
+
+    # \rightarrow / \to → →
+    text = text.replace('\\rightarrow', '\u2192')
+    text = text.replace('\\to', '\u2192')
+
+    # \times → ×
+    text = text.replace('\\times', '\u00d7')
+
+    # ^{...} → superscript
+    text = re.sub(r'\^{([^}]*)}', lambda m: _to_superscript(m.group(1)), text)
+
+    # ^X (single char) → superscript
+    text = re.sub(r'\^([0-9+\-n])', lambda m: _to_superscript(m.group(1)), text)
+
+    # _{...} → subscript
+    text = re.sub(r'_{([^}]*)}', lambda m: _to_subscript(m.group(1)), text)
+
+    # _X (single char) → subscript (digits and common letters)
+    text = re.sub(r'_([0-9aehklmnopstx])', lambda m: _to_subscript(m.group(1)), text)
+
+    # Clean leftover backslashes from unknown commands
+    text = re.sub(r'\\([a-zA-Z]+)', r'\1', text)
+
+    return text
+
+
+# ============================================================
 # UTILITIES
 # ============================================================
 
-def _strip_latex(text: str) -> str:
-    """Remove $ delimiters from LaTeX for Excel: $H_2O$ -> H_2O"""
-    if not text:
-        return ""
-    return re.sub(r'\$([^$]+)\$', r'\1', str(text))
-
-
 def _clean(text: str) -> str:
-    """Clean text for Excel: strip LaTeX delimiters, normalize whitespace."""
-    text = _strip_latex(str(text) if text else "")
+    """Clean text for Excel: convert LaTeX to Unicode, normalize whitespace."""
+    text = latex_to_unicode(str(text) if text else "")
     text = text.replace('\\n\\n', '\n').replace('\\n', '\n')
     return text.strip()
 
 
-def _explanation_text(explanation) -> str:
-    """Convert explanation dict or string to single text block."""
-    if isinstance(explanation, dict):
-        parts = []
-        for k, v in explanation.items():
-            if v:
-                parts.append(f"{k.upper()}: {_clean(v)}")
-        return "\n".join(parts)
-    return _clean(str(explanation)) if explanation else ""
+def _format_time(seconds) -> str:
+    """Format seconds as 'Xm Ys' or 'Xs'."""
+    if seconds is None or seconds == "":
+        return ""
+    try:
+        s = float(seconds)
+    except (ValueError, TypeError):
+        return str(seconds)
+    if s >= 60:
+        return f"{int(s // 60)}m {int(s % 60)}s"
+    return f"{s:.1f}s"
 
 
 # ============================================================
@@ -75,21 +151,17 @@ def _auto_width(ws):
         ws.column_dimensions[letter].width = min(max(max_len + 2, 10), 60)
 
 
-def _add_meta_row(ws, row: int, col_start: int, metadata: dict, is_first: bool):
-    """Add Time to Run, token, and cost columns. Only populate on first data row."""
-    if not is_first:
-        return
+def _add_meta_row(ws, row: int, col_start: int, metadata: dict):
+    """Add Time, token, and cost columns. Populated on EVERY row."""
     token_usage = metadata.get("token_usage", {})
     gen = token_usage.get("generation", {}) or {}
     cost = token_usage.get("cost", {}) or {}
 
-    ws.cell(row=row, column=col_start).value = metadata.get("generation_time", "")
+    ws.cell(row=row, column=col_start).value = _format_time(metadata.get("generation_time", ""))
     ws.cell(row=row, column=col_start + 1).value = gen.get("input_tokens", "")
     ws.cell(row=row, column=col_start + 2).value = gen.get("output_tokens", "")
-    ws.cell(row=row, column=col_start + 3).value = gen.get("total_tokens", "")
-    ws.cell(row=row, column=col_start + 4).value = cost.get("input_cost", "")
-    ws.cell(row=row, column=col_start + 5).value = cost.get("output_cost", "")
-    ws.cell(row=row, column=col_start + 6).value = cost.get("total_cost", "")
+    ws.cell(row=row, column=col_start + 3).value = cost.get("input_cost", "")
+    ws.cell(row=row, column=col_start + 4).value = cost.get("output_cost", "")
 
 
 # ============================================================
@@ -135,23 +207,23 @@ def _parse_mtc(question_text: str):
 
 MCQ_HEADERS = [
     "Question Number", "Question", "Option A", "Option B", "Option C", "Option D",
-    "Correct Answer", "Explanation", "Accuracy", "Comment",
-    "Time to Run", "Input Tokens", "Output Tokens", "Total Tokens",
-    "Input Cost (Rs)", "Output Cost (Rs)", "Total Cost (Rs)"
+    "Correct Answer", "Accuracy", "Comment",
+    "Time to Run", "Input Tokens", "Output Tokens",
+    "Input Cost (Rs)", "Output Cost (Rs)"
 ]
 
 AR_HEADERS = [
     "Question Number", "Assertion (A)", "Reason (R)", "Correct Answer",
-    "Explanation", "Accuracy", "Comment",
-    "Time to Run", "Input Tokens", "Output Tokens", "Total Tokens",
-    "Input Cost (Rs)", "Output Cost (Rs)", "Total Cost (Rs)"
+    "Accuracy", "Comment",
+    "Time to Run", "Input Tokens", "Output Tokens",
+    "Input Cost (Rs)", "Output Cost (Rs)"
 ]
 
 MTC_HEADERS = [
     "Question Number", "List I", "List II", "Correct Answer",
-    "Explanation", "Accuracy", "Comment",
-    "Time to Run", "Input Tokens", "Output Tokens", "Total Tokens",
-    "Input Cost (Rs)", "Output Cost (Rs)", "Total Cost (Rs)"
+    "Accuracy", "Comment",
+    "Time to Run", "Input Tokens", "Output Tokens",
+    "Input Cost (Rs)", "Output Cost (Rs)"
 ]
 
 
@@ -170,9 +242,8 @@ def _build_mcq_sheet(ws, questions: list, metadata: dict):
         ws.cell(row=row, column=5).value = _clean(opts.get("c", ""))
         ws.cell(row=row, column=6).value = _clean(opts.get("d", ""))
         ws.cell(row=row, column=7).value = (q.get("correct_answer") or "").upper()
-        ws.cell(row=row, column=8).value = _explanation_text(q.get("explanation"))
-        # 9=Accuracy, 10=Comment left blank
-        _add_meta_row(ws, row, 11, metadata, is_first=(idx == 0))
+        # 8=Accuracy, 9=Comment left blank
+        _add_meta_row(ws, row, 10, metadata)
 
         for c in range(1, len(MCQ_HEADERS) + 1):
             ws.cell(row=row, column=c).alignment = _CELL_ALIGN
@@ -192,9 +263,8 @@ def _build_ar_sheet(ws, questions: list, metadata: dict):
         ws.cell(row=row, column=2).value = assertion
         ws.cell(row=row, column=3).value = reason
         ws.cell(row=row, column=4).value = (q.get("correct_answer") or "").upper()
-        ws.cell(row=row, column=5).value = _explanation_text(q.get("explanation"))
-        # 6=Accuracy, 7=Comment left blank
-        _add_meta_row(ws, row, 8, metadata, is_first=(idx == 0))
+        # 5=Accuracy, 6=Comment left blank
+        _add_meta_row(ws, row, 7, metadata)
 
         for c in range(1, len(AR_HEADERS) + 1):
             ws.cell(row=row, column=c).alignment = _CELL_ALIGN
@@ -214,9 +284,8 @@ def _build_mtc_sheet(ws, questions: list, metadata: dict):
         ws.cell(row=row, column=2).value = list_i
         ws.cell(row=row, column=3).value = list_ii
         ws.cell(row=row, column=4).value = (q.get("correct_answer") or "").upper()
-        ws.cell(row=row, column=5).value = _explanation_text(q.get("explanation"))
-        # 6=Accuracy, 7=Comment left blank
-        _add_meta_row(ws, row, 8, metadata, is_first=(idx == 0))
+        # 5=Accuracy, 6=Comment left blank
+        _add_meta_row(ws, row, 7, metadata)
 
         for c in range(1, len(MTC_HEADERS) + 1):
             ws.cell(row=row, column=c).alignment = _CELL_ALIGN
@@ -322,23 +391,20 @@ def read_excel_for_review(excel_bytes: bytes) -> tuple:
                     "d": vals[header_map.get("Option D", 5)] or "",
                 }
                 q["correct_answer"] = vals[header_map.get("Correct Answer", 6)] or ""
-                q["explanation"] = vals[header_map.get("Explanation", 7)] or ""
-                q["accuracy"] = vals[header_map.get("Accuracy", 8)] or ""
-                q["comment"] = vals[header_map.get("Comment", 9)] or ""
+                q["accuracy"] = vals[header_map.get("Accuracy", 7)] or ""
+                q["comment"] = vals[header_map.get("Comment", 8)] or ""
             elif qtype == "ASSERTION_REASON":
                 q["assertion"] = vals[header_map.get("Assertion (A)", 1)] or ""
                 q["reason"] = vals[header_map.get("Reason (R)", 2)] or ""
                 q["correct_answer"] = vals[header_map.get("Correct Answer", 3)] or ""
-                q["explanation"] = vals[header_map.get("Explanation", 4)] or ""
-                q["accuracy"] = vals[header_map.get("Accuracy", 5)] or ""
-                q["comment"] = vals[header_map.get("Comment", 6)] or ""
+                q["accuracy"] = vals[header_map.get("Accuracy", 4)] or ""
+                q["comment"] = vals[header_map.get("Comment", 5)] or ""
             elif qtype == "MATCH_THE_COLUMN":
                 q["list_i"] = vals[header_map.get("List I", 1)] or ""
                 q["list_ii"] = vals[header_map.get("List II", 2)] or ""
                 q["correct_answer"] = vals[header_map.get("Correct Answer", 3)] or ""
-                q["explanation"] = vals[header_map.get("Explanation", 4)] or ""
-                q["accuracy"] = vals[header_map.get("Accuracy", 5)] or ""
-                q["comment"] = vals[header_map.get("Comment", 6)] or ""
+                q["accuracy"] = vals[header_map.get("Accuracy", 4)] or ""
+                q["comment"] = vals[header_map.get("Comment", 5)] or ""
 
             all_questions.append(q)
 
