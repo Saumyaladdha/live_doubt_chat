@@ -66,9 +66,11 @@ def latex_to_unicode(text: str) -> str:
     # standalone \circ → °
     text = text.replace('\\circ', '\u00b0')
 
-    # \rightarrow / \to → →
-    text = text.replace('\\rightarrow', '\u2192')
-    text = text.replace('\\to', '\u2192')
+    # Arrows
+    text = text.replace('\\rightleftharpoons', '\u21cc')  # ⇌ equilibrium
+    text = text.replace('\\rightarrow', '\u2192')          # →
+    text = text.replace('\\leftarrow', '\u2190')           # ←
+    text = text.replace('\\to', '\u2192')                  # →
 
     # \times → ×
     text = text.replace('\\times', '\u00d7')
