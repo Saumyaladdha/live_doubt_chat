@@ -22,7 +22,7 @@ Your questions must NEVER contain:
 - "is described as", "is mentioned as", "explicitly stated", "specifically named"
 - "gives the", "shows the", "lists the", "describes the"
 - "given in the text", "shown in the text", "listed in the text", "mentioned in the text", "according to the text"
-- "according to the ... shown", "values shown", "values given", "data given"
+- "according to the ... shown", "values shown", "values given", "data given","in the given"
 - ANY reference to the source material's structure, layout, formatting, or data presentation
 
 TEST: Can a student with NO textbook still understand and answer your question? If NO $\rightarrow$ rewrite.
@@ -47,16 +47,6 @@ BAD: "The bond energy of $N_2$ is:", "The lattice enthalpy of NaCl is approximat
 GOOD: "Which of the following has the highest bond energy?", "The correct order of lattice enthalpy is:"
 GOOD: "Which has the smallest atomic radius?", "The element with the highest ionisation enthalpy among the following is:"
 If a question tests a numerical value $\rightarrow$ convert it to a comparison, trend, or ordering question.
-
-FOR MTC — NUMERICAL VALUES IN LIST II:
-Numbers ARE allowed in List II ONLY IF the student can match them using NEET-level trends taught in NCERT — NOT by memorising the exact value.
-Only use trends that are actually tested in NEET: periodic trends, bond order, electronegativity, ionic/atomic size, ionisation enthalpy, electron gain enthalpy, oxidation states, acidity/basicity order.
-GOOD: Bond enthalpy — $N_2$ (946), $O_2$ (498), $H_2$ (435.8), HCl (431) ← student matches by bond order: triple > double > single. NEET-level trend.
-GOOD: Atomic radii — O (66 pm), N (74 pm), C (77 pm), B (88 pm) ← periodic trend: radius increases left across period. NEET-level trend.
-GOOD: $pK_b$ values of amines ← student matches by basicity order (aliphatic > aromatic, $2° > 1° > 3°$ for aliphatic). NEET-level trend.
-BAD: Lattice enthalpy — NaCl (786), KCl (715), CsCl (661), RbCl (689) ← values too close, no clear NEET-level trend distinguishes them.
-BAD: Obscure thermodynamic constants, crystal field splitting values, or any data not covered in NCERT.
-TEST: Can a NEET student who studied NCERT trends (not exact numbers) still get the correct matching? If YES $\rightarrow$ allowed. If NO $\rightarrow$ rewrite List II as descriptive ("Highest", "2nd highest", "Lowest").
 
 
 INPUT PARAMETERS
@@ -2048,6 +2038,18 @@ If any fails $\rightarrow$ fix. If unsure about a pairing $\rightarrow$ remove t
 
 ------------------------------------------------------------
 ------------------------------------------------------------
+NUMERICAL VALUES IN LIST II (MTC-SPECIFIC RULE)
+
+Numbers ARE allowed in List II ONLY IF the student can match them using NEET-level trends taught in NCERT — NOT by memorising the exact value.
+Only use trends that are actually tested in NEET: periodic trends, bond order, electronegativity, ionic/atomic size, ionisation enthalpy, electron gain enthalpy, oxidation states, acidity/basicity order.
+GOOD: Bond enthalpy — $N_2$ (946), $O_2$ (498), $H_2$ (435.8), HCl (431) ← student matches by bond order: triple > double > single. NEET-level trend.
+GOOD: Atomic radii — O (66 pm), N (74 pm), C (77 pm), B (88 pm) ← periodic trend: radius increases left across period. NEET-level trend.
+GOOD: $pK_b$ values of amines ← student matches by basicity order (aliphatic > aromatic, $2° > 1° > 3°$ for aliphatic). NEET-level trend.
+BAD: Lattice enthalpy — NaCl (786), KCl (715), CsCl (661), RbCl (689) ← values too close, no clear NEET-level trend distinguishes them.
+BAD: Obscure thermodynamic constants, crystal field splitting values, or any data not covered in NCERT.
+TEST: Can a NEET student who studied NCERT trends (not exact numbers) still get the correct matching? If YES $\rightarrow$ allowed. If NO $\rightarrow$ rewrite List II as descriptive ("Highest", "2nd highest", "Lowest").
+
+------------------------------------------------------------
 ANSWER CORRECTNESS (EASY MTC — #1 PRIORITY)
 
 ACCURACY > QUANTITY. Generate fewer correct questions rather than more wrong ones.
@@ -2341,6 +2343,18 @@ Correct answers MUST be randomly and roughly equally distributed across A, B, C,
 - No letter should have zero correct answers.
 - NEVER default to "A" as correct. Vary the correct option across questions.
 - Before outputting: count correct answers per letter. If any letter > 40% or any letter = 0 $\rightarrow$ reshuffle options to fix.
+
+------------------------------------------------------------
+NUMERICAL VALUES IN LIST II (MTC-SPECIFIC RULE)
+
+Numbers ARE allowed in List II ONLY IF the student can match them using NEET-level trends taught in NCERT — NOT by memorising the exact value.
+Only use trends that are actually tested in NEET: periodic trends, bond order, electronegativity, ionic/atomic size, ionisation enthalpy, electron gain enthalpy, oxidation states, acidity/basicity order.
+GOOD: Bond enthalpy — $N_2$ (946), $O_2$ (498), $H_2$ (435.8), HCl (431) ← student matches by bond order: triple > double > single. NEET-level trend.
+GOOD: Atomic radii — O (66 pm), N (74 pm), C (77 pm), B (88 pm) ← periodic trend: radius increases left across period. NEET-level trend.
+GOOD: $pK_b$ values of amines ← student matches by basicity order (aliphatic > aromatic, $2° > 1° > 3°$ for aliphatic). NEET-level trend.
+BAD: Lattice enthalpy — NaCl (786), KCl (715), CsCl (661), RbCl (689) ← values too close, no clear NEET-level trend distinguishes them.
+BAD: Obscure thermodynamic constants, crystal field splitting values, or any data not covered in NCERT.
+TEST: Can a NEET student who studied NCERT trends (not exact numbers) still get the correct matching? If YES $\rightarrow$ allowed. If NO $\rightarrow$ rewrite List II as descriptive ("Highest", "2nd highest", "Lowest").
 
 ------------------------------------------------------------
 ANSWER CORRECTNESS (MEDIUM MTC — #1 PRIORITY)
@@ -2787,6 +2801,18 @@ LIST ITEM LENGTH RULES (CRITICAL)
 - List II items: MAX 15 words each. State the outcome/result — NO mechanism.
   BAD: "$Cr_2O_7^{{2-}}$ + 2 $OH^-$ $\rightleftharpoons$ 2 $CrO_4^{{2-}}$ + $H_2O$; hydroxide converts dichromate into chromate"
   GOOD: "Dichromate $\rightarrow$ chromate conversion"
+------------------------------------------------------------
+NUMERICAL VALUES IN LIST II (MTC-SPECIFIC RULE)
+
+Numbers ARE allowed in List II ONLY IF the student can match them using NEET-level trends taught in NCERT — NOT by memorising the exact value.
+Only use trends that are actually tested in NEET: periodic trends, bond order, electronegativity, ionic/atomic size, ionisation enthalpy, electron gain enthalpy, oxidation states, acidity/basicity order.
+GOOD: Bond enthalpy — $N_2$ (946), $O_2$ (498), $H_2$ (435.8), HCl (431) ← student matches by bond order: triple > double > single. NEET-level trend.
+GOOD: Atomic radii — O (66 pm), N (74 pm), C (77 pm), B (88 pm) ← periodic trend: radius increases left across period. NEET-level trend.
+GOOD: $pK_b$ values of amines ← student matches by basicity order (aliphatic > aromatic, $2° > 1° > 3°$ for aliphatic). NEET-level trend.
+BAD: Lattice enthalpy — NaCl (786), KCl (715), CsCl (661), RbCl (689) ← values too close, no clear NEET-level trend distinguishes them.
+BAD: Obscure thermodynamic constants, crystal field splitting values, or any data not covered in NCERT.
+TEST: Can a NEET student who studied NCERT trends (not exact numbers) still get the correct matching? If YES $\rightarrow$ allowed. If NO $\rightarrow$ rewrite List II as descriptive ("Highest", "2nd highest", "Lowest").
+
 ------------------------------------------------------------
 ANSWER CORRECTNESS (HARD MTC — #1 PRIORITY)
 
