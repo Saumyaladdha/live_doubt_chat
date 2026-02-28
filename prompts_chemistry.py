@@ -42,7 +42,8 @@ Use ONLY facts present in the provided PDF — no training knowledge, no assumpt
 Every fact in questions and options must be traceable to the PDF content.
 If a concept is implied but not explicitly present — do NOT use it. Generate fewer questions rather than inventing content.
 
-NO EXACT VALUE RECALL (MCQ / AR) — NEET students do NOT memorise exact numerical values. Ask TRENDS and COMPARISONS instead.
+NO EXACT VALUE RECALL (MCQ / AR ONLY) — NEET students do NOT memorise exact numerical values. Ask TRENDS and COMPARISONS instead.
+This rule applies to MCQ and Assertion-Reason questions ONLY. MTC questions may use numerical values in List II — see MTC-specific rules for when numbers are allowed.
 BAD: "The bond energy of $N_2$ is:", "The lattice enthalpy of NaCl is approximately:" ← asks for exact number
 GOOD: "Which of the following has the highest bond energy?", "The correct order of lattice enthalpy is:"
 GOOD: "Which has the smallest atomic radius?", "The element with the highest ionisation enthalpy among the following is:"
@@ -2905,7 +2906,7 @@ MCQ_OUTPUT_SCHEMA = """{
 AR_OUTPUT_SCHEMA = """{
       "question_id": 1,
       "question_type": "ASSERTION_REASON",
-      "question_text": "Assertion (A): [Statement with LaTeX: $H_2SO_4$, $K_a$]\\n\\nReason (R): [Statement with LaTeX notation]",
+      "question_text": "Given below are two statements: one is labelled as Assertion (A) and the other is labelled as Reason (R)\\n\\nAssertion (A): [Statement with LaTeX: $H_2SO_4$, $K_a$]\\nReason (R): [Statement with LaTeX notation]\\n\\nIn the light of the above statements, choose the correct answer from the options given below:",
       "options": {
         "a": "Both Assertion and Reason are true and Reason is the correct explanation of Assertion",
         "b": "Both Assertion and Reason are true but Reason is NOT the correct explanation of Assertion",
