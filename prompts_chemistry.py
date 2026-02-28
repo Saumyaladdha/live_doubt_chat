@@ -4,9 +4,9 @@ You are receiving a TEXTBOOK PDF directly. Read ALL pages thoroughly before gene
 
 NEET PHRASING (CRITICAL):
 Every question must sound like an actual NEET PYQ NOT like a textbook exercise.
-BAD (textbook): "What is the hybridisation of carbon in ethene?", "Define electronegativity.", "X is known as ___"
-GOOD (NEET): "The hybridisation of carbon in ethene is:", "The correct order of electronegativity is:", "Which of the following statements is correct?"
-NEVER use: "is defined as", "is known as", "is called", "What is", "Define", "Name the", "State the".
+BAD (textbook): "What is the hybridisation of carbon in ethene?", "Define electronegativity.", "X is known as ___", "Fill in the blank: The general formula..."
+GOOD (NEET): "The hybridisation of carbon in ethene is:", "The correct order of electronegativity is:", "Which of the following statements is correct?", "The general formula of the simple hydride formed by Group 1 elements is:"
+NEVER use: "is defined as", "is known as", "is called", "What is", "Define", "Name the", "State the", "Fill in the blank", "Fill in the blanks".
 
 RULE #0 — STANDALONE QUESTIONS (HIGHEST PRIORITY)
 Every question must be a STANDALONE NEET PYQ a student in an exam hall with NO textbook must fully understand and answer it.
@@ -160,37 +160,9 @@ QUALITY CONTROL RULES (APPLIED TO ALL QUESTIONS)
    - MAX 2 questions out of 10 can use the same question pattern/template
    - For every 5 questions, use AT LEAST 4 different question structures
 
-5. QUESTION CORRECTNESS (CRITICAL — #1 PRIORITY — READ THIS CAREFULLY):
+5. QUESTION CORRECTNESS (UNIVERSAL):
    ACCURACY > QUANTITY. Generate fewer correct questions rather than more wrong ones.
-
-   FOR MCQ:
-   - Exactly 1 option MUST be correct. The other 3 MUST be clearly wrong.
-   - TEST: Read each option — can MORE than 1 be correct? If yes $\rightarrow$ rewrite until only 1 is correct.
-   - Distractors must be CLEARLY wrong, not "partially correct" or "correct in some contexts".
-   - Example: "sp hybridization gives _____ geometry" $\rightarrow$ only "linear" is correct. "Tetrahedral" is CLEARLY wrong. No ambiguity.
-
-   FOR ASSERTION-REASON:
-   - Assertion MUST be a clear factual statement — unambiguously TRUE or FALSE based on the PDF.
-   - Reason MUST be a clear factual statement — unambiguously TRUE or FALSE.
-   - NEVER use statements that are "partially true" or "debatable". Both A and R must have a definite truth value.
-   - The relationship (explains / doesn't explain) must be unambiguous.
-
-   FOR MATCH THE COLUMN:
-   - Each List I item MUST match exactly ONE List II item. No item should plausibly match 2 items.
-   - The correct option (1 out of 4) must have ALL 4 pairings correct. The other 3 options must have at least 1 wrong pairing.
-   - TEST: Can a student argue that a different matching is also correct? If yes $\rightarrow$ rewrite.
-   - ZERO KEYWORD OVERLAP (CRITICAL): List I and List II must share NO common words/terms that reveal the match.
-     A non-chemistry student reading ONLY the words should NOT be able to guess the correct pairing.
-     BAD: "Octahedral complex" $\rightarrow$ "Octahedral geometry" ← keyword "octahedral" gives it away
-     BAD: "$Ca_3P_2 + H_2SO_4 \rightarrow PH_3$" $\rightarrow$ "Gives $PH_3$" ← keyword "$PH_3$" gives it away
-     BAD: "Wurtz reaction" $\rightarrow$ "Wurtz used Na/dry ether" ← name "Wurtz" gives it away
-     GOOD: "Wurtz reaction" $\rightarrow$ "Na / dry ether" ← student must KNOW the reagent, no shared keyword
-     GOOD: "B-lymphocytes" $\rightarrow$ "Red bone marrow" ← zero word overlap, requires real knowledge
-     Column I = one category (compounds, reactions, ions, processes). Column II = a DIFFERENT category (properties, reagents, products, locations).
-     TEST: Cover List I. Can someone match List II items just by reading keywords? If YES $\rightarrow$ REWRITE.
-
-   FOR ALL TYPES:
-   - Every fact must match the PDF. If unsure $\rightarrow$ skip that question.
+   Every fact must match the PDF. If unsure $\rightarrow$ skip that question.
 
 6. SPREAD ACROSS THE ENTIRE PDF (CRITICAL — #1 QUALITY RULE):
    Read ALL pages of the PDF BEFORE writing a single question.
@@ -215,17 +187,10 @@ QUALITY CONTROL RULES (APPLIED TO ALL QUESTIONS)
    If the PDF covers 6 sub-topics $\rightarrow$ spread questions across at least 4-5 of them.
    HARD FAIL: If 80%+ questions come from the same topic/chapter when other topics exist in the PDF $\rightarrow$ REWRITE.
 
-7. CROSS-PAGE CONNECTIONS (MANDATORY FOR HARD, ENCOURAGED FOR MEDIUM):
-   For HARD questions: At least 30% MUST connect concepts from DIFFERENT sections of the PDF.
-   For MEDIUM questions: At least 20% MUST connect concepts across sections.
-   For EASY questions: Each question MUST come from a different part of the PDF than the previous one.
-   Example: compare a defect type from page 5 with a semiconductor property from page 12.
-   NEVER make all questions from the first 2-3 pages — this is a HARD FAILURE.
-
-8. RANDOMIZE CORRECT ANSWER POSITION:
+7. RANDOMIZE CORRECT ANSWER POSITION:
    Distribute correct answers roughly equally across A, B, C, D. NEVER put all correct answers in the same position.
 
-9. LaTeX FORMATTING (CRITICAL):
+8. LaTeX FORMATTING (CRITICAL):
    Use inline LaTeX $...$ for ALL chemistry notation. NEVER use plain text or Unicode for formulas.
    GOOD: $4d^{{10}}5s^0$, $H_2SO_4$, $\\Delta H$, $sp^3d^2$, $(n-1)d^{{1-10}} ns^{{1-2}}$, $FeSO_4 \\cdot (NH_4)_2SO_4 \\cdot 6H_2O$
    BAD: $H_2SO_4$, $Fe^{{3+}}$, d1-10, sp3d2 ← plain text or Unicode will not render properly
@@ -562,17 +527,43 @@ If any mismatch $\rightarrow$ fix. If unsure about a fact $\rightarrow$ remove t
 ------------------------------------------------------------
 FINAL VALIDATION CHECK (INTERNAL)
 
+------------------------------------------------------------
+ANSWER CORRECTNESS (EASY — #1 PRIORITY)
+
+ACCURACY > QUANTITY. Generate fewer correct questions rather than more wrong ones.
+- Exactly 1 option MUST be correct. The other 3 MUST be clearly wrong.
+- TEST: Read each option — can MORE than 1 be correct? If yes $\rightarrow$ rewrite until only 1 is correct.
+- Distractors must be CLEARLY wrong — not "partially correct" or "correct in some contexts".
+- NO VAGUE OPTIONS: Every option must be specific and testable. Never use "All of the above", "None of the above", or options that are too broad to be clearly right or wrong.
+  BAD options: "It depends on conditions", "Sometimes true", "Varies with temperature" ← vague, untestable
+  GOOD options: "$sp^3$", "$sp^2$", "$sp$", "$sp^3d$" ← specific, one is clearly correct
+- Distractors should be PLAUSIBLE but WRONG — they should be real chemistry terms/values that a student who didn't study might pick, but a prepared student can eliminate.
+  BAD distractor: "Banana" for a hybridisation question ← absurd, not plausible
+  GOOD distractor: "$sp^3d^2$" when answer is "$sp^3d$" ← plausible but clearly wrong
+
+------------------------------------------------------------
+PAGE COVERAGE (EASY)
+
+Each question MUST come from a DIFFERENT part of the PDF than the previous one.
+No two consecutive questions from the same page.
+NEVER make all questions from the first 2-3 pages — this is a HARD FAILURE.
+
+------------------------------------------------------------
+FINAL CHECKLIST
+
 Before producing output, verify:
-2. Format mix satisfied (Standard MCQ + Fill in the Blank)?
-3. Minimum category diversity satisfied (4+ categories for 10+ questions)?
-4. No banned source-reference phrases? (plot, curve, graph, axis, labelled, illustrated, shown, listed, mentioned, stated, described, provided, discussed, passage, text, figure, table, caption, diagram)
-5. No questions ABOUT the source material/graph/plot? (must ask chemistry, not what the source shows)
-6. No data lookup questions?
-7. No unit definition/conversion questions?
-8. No repeated fact or concept? No two questions with same question pattern?
-9. Difficulty strictly Easy (single cognitive step)?
-10. Answer distribution balanced (each letter 15-40%)?
-11. PDF SPREAD CHECK: Do questions come from at least 3 different sections of the PDF? Are beginning, middle, AND end represented? If all questions cluster from pages 1-3 $\rightarrow$ redistribute.
+1. Format mix satisfied (Standard MCQ + Fill in the Blank)?
+2. Minimum category diversity satisfied (4+ categories for 10+ questions)?
+3. No banned source-reference phrases? (plot, curve, graph, axis, labelled, illustrated, shown, listed, mentioned, stated, described, provided, discussed, passage, text, figure, table, caption, diagram)
+4. No questions ABOUT the source material/graph/plot? (must ask chemistry, not what the source shows)
+5. No data lookup questions?
+6. No unit definition/conversion questions?
+7. No repeated fact or concept? No two questions with same question pattern?
+8. Difficulty strictly Easy (single cognitive step)?
+9. Answer distribution balanced (each letter 15-40%)?
+10. PDF SPREAD CHECK: Do questions come from at least 3 different sections of the PDF? Are beginning, middle, AND end represented? If all questions cluster from pages 1-3 $\rightarrow$ redistribute.
+11. EVERY option is specific and testable — no vague/broad options?
+12. Exactly 1 correct answer per question — no dual correct?
 
 If any violation exists $\rightarrow$ regenerate internally before output.
 
@@ -901,6 +892,18 @@ Every question must be answerable from CHEMISTRY KNOWLEDGE ALONE.
 
 ---------------------------------------------------------------------
 
+ANSWER CORRECTNESS (MEDIUM — #1 PRIORITY)
+
+ACCURACY > QUANTITY. Generate fewer correct questions rather than more wrong ones.
+- Exactly 1 option MUST be correct. The other 3 MUST be clearly wrong.
+- TEST: Read each option — can MORE than 1 be correct? If yes $\rightarrow$ rewrite until only 1 is correct.
+- NO VAGUE OPTIONS: Every option must be specific and testable.
+  BAD: "It depends on conditions", "Sometimes true", "May vary", "Generally increases" ← vague, untestable
+  GOOD: "Increases from left to right across a period", "Decreases down the group" ← specific, verifiable
+- Distractors must target COMMON MISCONCEPTIONS — things a student who studied superficially would pick.
+
+---------------------------------------------------------------------
+
 DISTRACTOR RULES (STRICT)
 
 Each distractor must:
@@ -984,7 +987,9 @@ For EACH question confirm:
 8. No unit definition/conversion questions?
 9. PDF SPREAD CHECK: Do questions cover content from beginning, middle, AND end of the PDF? If clustered $\rightarrow$ redistribute.
 10. CONCEPT DIVERSITY: No two questions test the same concept. No question pattern repeated more than twice.
-11. CROSS-PAGE: For 10+ questions, at least 20% should integrate or compare concepts from different parts of the PDF.
+11. CROSS-PAGE CONNECTIONS (MANDATORY — 20%): At least 20% of questions MUST connect or compare concepts from DIFFERENT sections of the PDF.
+   Example: Compare a property from page 3 with a related concept from page 10.
+   NEVER make all questions from the first 2-3 pages — this is a HARD FAILURE.
 
 If any condition fails $\rightarrow$ REWRITE.
 
@@ -1141,6 +1146,24 @@ G: 4 short answers (1 line each, all plausible)
 
 Balanced distribution: no letter used 0 times, no letter > 40%.
 
+════════════ ANSWER CORRECTNESS (HARD — #1 PRIORITY) ════════════
+
+ACCURACY > QUANTITY. Generate fewer correct questions rather than more wrong ones.
+- Every statement's TRUE/FALSE value MUST match the PDF. If unsure $\rightarrow$ skip that question.
+- For multi-statement questions: verify EACH statement independently before building the combination.
+- For ordering questions: verify the sequence using actual values/trends from the PDF.
+- NO VAGUE STATEMENTS: Every statement must be specific and clearly TRUE or FALSE.
+  BAD: "Transition metals generally show catalytic activity" ← "generally" makes it vague
+  GOOD: "Finely divided iron acts as a catalyst in the Haber process because $Fe$ provides an alternate low-energy pathway for $N_2$ dissociation" ← specific, testable
+- Distractors must be near-miss combinations that a student with shallow understanding would pick.
+
+════════════ CROSS-PAGE CONNECTIONS (MANDATORY — 30%) ════════════
+
+At least 30% of questions MUST connect concepts from DIFFERENT sections of the PDF.
+Example: Compare a defect type from page 5 with a semiconductor property from page 12.
+Pull statements within a single question from DIFFERENT parts of the PDF — not all from one paragraph.
+NEVER make all questions from the first 2-3 pages — this is a HARD FAILURE.
+
 ════════════ ANSWER VERIFICATION ════════════
 1. Verify correct_answer matches the PDF content.
 2. For multi-statement questions: verify each statement TRUE/FALSE independently, then confirm the correct combination option matches.
@@ -1148,14 +1171,16 @@ Balanced distribution: no letter used 0 times, no letter > 40%.
 If any mismatch $\rightarrow$ fix. If unsure $\rightarrow$ remove that question entirely.
 
 ════════════ FINAL CHECKLIST ════════════
-2. Category variety — questions spread across multiple types (A-G)?
-3. Every statement needs reasoning (not recall)?
-4. At least 1 trap per question?
-5. No source references anywhere?
-6. No repeated concepts across questions?
-7. Balanced answer distribution?
-8. Questions span beginning, middle, AND end of PDF?
-9. Feels like a real NEET paper — diverse formats, not all the same?
+1. Category variety — questions spread across multiple types (A-G)?
+2. Every statement needs reasoning (not recall)?
+3. At least 1 trap per question?
+4. No source references anywhere?
+5. No repeated concepts across questions?
+6. Balanced answer distribution?
+7. Questions span beginning, middle, AND end of PDF?
+8. At least 30% cross-page connections?
+9. No vague/untestable statements or options?
+10. Feels like a real NEET paper — diverse formats, not all the same?
 
 If any fails $\rightarrow$ fix before output.
 """
@@ -1331,6 +1356,25 @@ NOT allowed at Easy level:
 If present $\rightarrow$ simplify or rewrite.
 
 ------------------------------------------------------------
+ANSWER CORRECTNESS (EASY AR — #1 PRIORITY)
+
+ACCURACY > QUANTITY. Generate fewer correct questions rather than more wrong ones.
+- Assertion MUST be a clear factual statement — unambiguously TRUE or FALSE based on the PDF.
+- Reason MUST be a clear factual statement — unambiguously TRUE or FALSE.
+- NEVER use statements that are "partially true" or "debatable". Both A and R must have a definite truth value.
+- The relationship (explains / doesn't explain) must be unambiguous.
+- NO VAGUE STATEMENTS: Avoid "generally", "sometimes", "may", "can" — these make truth value unclear.
+  BAD: "Transition metals generally form coloured compounds" ← "generally" = vague
+  GOOD: "$Cu^{{2+}}$ compounds are coloured because of $d$-$d$ transitions" ← specific, testable
+
+------------------------------------------------------------
+PAGE COVERAGE (EASY AR)
+
+Each question MUST come from a DIFFERENT part of the PDF than the previous one.
+No two consecutive questions from the same page.
+NEVER make all questions from the first 2-3 pages — this is a HARD FAILURE.
+
+------------------------------------------------------------
 ANSWER VERIFICATION:
 1. Is A factually TRUE or FALSE based on the PDF?
 2. Is R factually TRUE or FALSE? Verify independently of A.
@@ -1340,16 +1384,17 @@ If your answer doesn't match this logic $\rightarrow$ fix. If unsure about A or 
 
 ------------------------------------------------------------
 FINAL VALIDATION (verify EACH question)
-2. A is self-contained, tests a chemistry principle?
-3. R is self-contained, explains a chemistry concept?
-4. TYPE 1: R genuinely explains A (cause-effect)? TYPE 2: R true but different aspect?
-5. TYPE 3: R clearly false? TYPE 4: A clearly false?
-6. No source references in questions?
-7. Each question tests a different concept from a different part of the PDF?
-8. Answer distribution balanced and non-predictable?
-9. SOURCE REFERENCE SCAN: Do A or R contain "listed", "sequence", "shown", "given", "table", "figure", "data", "illustrated", "depicted", "chart", "above", "below", "provided", "discussed", "content", "material", "focus", "axis", "plot", "graph", "labelled", "caption", "heading", "curve", "legend"? If referencing external material $\rightarrow$ REWRITE.
-10. CHEMISTRY PRINCIPLE CHECK: Does A state a property/reaction/law/trend? If it just lists/identifies/describes source content $\rightarrow$ REWRITE.
-11. PDF SPREAD: Concepts come from at least 3 different sections of the PDF? Beginning, middle, AND end covered?
+1. A is self-contained, tests a chemistry principle?
+2. R is self-contained, explains a chemistry concept?
+3. TYPE 1: R genuinely explains A (cause-effect)? TYPE 2: R true but different aspect?
+4. TYPE 3: R clearly false? TYPE 4: A clearly false?
+5. No source references in questions?
+6. Each question tests a different concept from a different part of the PDF?
+7. Answer distribution balanced and non-predictable?
+8. SOURCE REFERENCE SCAN: Do A or R contain "listed", "sequence", "shown", "given", "table", "figure", "data", "illustrated", "depicted", "chart", "above", "below", "provided", "discussed", "content", "material", "focus", "axis", "plot", "graph", "labelled", "caption", "heading", "curve", "legend"? If referencing external material $\rightarrow$ REWRITE.
+9. CHEMISTRY PRINCIPLE CHECK: Does A state a property/reaction/law/trend? If it just lists/identifies/describes source content $\rightarrow$ REWRITE.
+10. PDF SPREAD: Concepts come from at least 3 different sections of the PDF? Beginning, middle, AND end covered?
+11. No vague statements (no "generally", "sometimes", "may")?
 
 If ANY fails $\rightarrow$ regenerate.
 
@@ -1495,6 +1540,23 @@ MEDIUM DIFFICULTY GUARDRAIL:
 - Does it require multi-step mechanism analysis? If yes $\rightarrow$ HARD, simplify.
 
 ------------------------------------------------------------
+ANSWER CORRECTNESS (MEDIUM AR — #1 PRIORITY)
+
+ACCURACY > QUANTITY. Generate fewer correct questions rather than more wrong ones.
+- Assertion MUST be a clear factual statement — unambiguously TRUE or FALSE based on the PDF.
+- Reason MUST be a clear factual statement — unambiguously TRUE or FALSE.
+- NEVER use statements that are "partially true" or "debatable". Both A and R must have a definite truth value.
+- The relationship (explains / doesn't explain) must be unambiguous.
+- NO VAGUE STATEMENTS: Avoid "generally", "sometimes", "may", "can" — these make truth value unclear.
+
+------------------------------------------------------------
+CROSS-PAGE CONNECTIONS (MANDATORY — 20%)
+
+At least 20% of questions MUST connect concepts from DIFFERENT sections of the PDF.
+Assertion from one section + Reason from another creates deeper conceptual connections.
+NEVER make all questions from the first 2-3 pages — this is a HARD FAILURE.
+
+------------------------------------------------------------
 ANSWER VERIFICATION:
 1. Is A factually TRUE or FALSE based on the PDF?
 2. Is R factually TRUE or FALSE? Verify independently of A.
@@ -1504,16 +1566,18 @@ If your answer doesn't match this logic $\rightarrow$ fix. If unsure about A or 
 
 ------------------------------------------------------------
 FINAL VALIDATION (verify EACH question)
-2. A tests understanding (not recall)?
-3. R is self-contained and meaningful?
-4. TYPE 1: R genuinely explains A (cause-effect)? TYPE 2: R true but different aspect?
-5. TYPE 3: R plausible but has specific error? TYPE 4: A has believable misconception?
-6. No source references in questions?
-7. Each question tests a different concept from a different part of the PDF?
-8. Answer distribution balanced and non-predictable?
-9. SOURCE REFERENCE SCAN: Do A or R contain "listed", "sequence", "shown", "given", "table", "figure", "data", "illustrated", "depicted", "chart", "above", "below", "provided", "discussed", "content", "material", "focus", "axis", "plot", "graph", "labelled", "caption", "heading", "curve", "legend"? If referencing external material $\rightarrow$ REWRITE.
-10. PDF SPREAD: Questions cover beginning, middle, AND end of the PDF? Concepts from at least 3 sections?
-11. CONCEPT DIVERSITY: No two questions test same concept. No question pattern repeated more than twice.
+1. A tests understanding (not recall)?
+2. R is self-contained and meaningful?
+3. TYPE 1: R genuinely explains A (cause-effect)? TYPE 2: R true but different aspect?
+4. TYPE 3: R plausible but has specific error? TYPE 4: A has believable misconception?
+5. No source references in questions?
+6. Each question tests a different concept from a different part of the PDF?
+7. Answer distribution balanced and non-predictable?
+8. SOURCE REFERENCE SCAN: Do A or R contain "listed", "sequence", "shown", "given", "table", "figure", "data", "illustrated", "depicted", "chart", "above", "below", "provided", "discussed", "content", "material", "focus", "axis", "plot", "graph", "labelled", "caption", "heading", "curve", "legend"? If referencing external material $\rightarrow$ REWRITE.
+9. PDF SPREAD: Questions cover beginning, middle, AND end of the PDF? Concepts from at least 3 sections?
+10. CONCEPT DIVERSITY: No two questions test same concept. No question pattern repeated more than twice.
+11. At least 20% cross-page connections?
+12. No vague statements (no "generally", "sometimes", "may")?
 
 If ANY fails $\rightarrow$ regenerate.
 
@@ -1663,6 +1727,23 @@ GOOD: "Catalytic activity of transition metals is due to variable oxidation stat
 If it requires mathematical derivation $\rightarrow$ TOO HARD for NEET. Scale back.
 
 ------------------------------------------------------------
+ANSWER CORRECTNESS (HARD AR — #1 PRIORITY)
+
+ACCURACY > QUANTITY. Generate fewer correct questions rather than more wrong ones.
+- Assertion MUST be a clear factual statement — unambiguously TRUE or FALSE based on the PDF.
+- Reason MUST be a clear factual statement — unambiguously TRUE or FALSE.
+- NEVER use statements that are "partially true" or "debatable". Both A and R must have a definite truth value.
+- The relationship (explains / doesn't explain) must be unambiguous.
+- NO VAGUE STATEMENTS: Avoid "generally", "sometimes", "may", "can" — these make truth value unclear.
+
+------------------------------------------------------------
+CROSS-PAGE CONNECTIONS (MANDATORY — 30%)
+
+At least 30% of questions MUST connect concepts from DIFFERENT sections of the PDF.
+A and R should ideally reference concepts from DIFFERENT parts of the PDF — e.g., Assertion about a property from one section + Reason about a mechanism from another.
+NEVER make all questions from the first 2-3 pages — this is a HARD FAILURE.
+
+------------------------------------------------------------
 ANSWER VERIFICATION:
 1. Is A factually TRUE or FALSE based on the PDF?
 2. Is R factually TRUE or FALSE? Verify independently of A.
@@ -1672,19 +1753,20 @@ If your answer doesn't match this logic $\rightarrow$ fix. If unsure about A or 
 
 ------------------------------------------------------------
 FINAL VALIDATION (verify EACH question)
-2. A requires mechanism-level understanding (not recall)?
-3. A described indirectly through properties where possible?
-4. TYPE 1: R gives genuine mechanistic explanation?
-5. TYPE 2: R related but not the mechanism?
-6. TYPE 3: R has subtle mechanistic error?
-7. TYPE 4: A has common misconception?
-8. No source references in questions?
-9. Each question tests a different concept from a different part of the PDF?
-10. Answer distribution balanced and non-predictable?
-11. SOURCE REFERENCE SCAN: Do A or R contain "listed", "sequence", "shown", "given", "table", "figure", "data", "illustrated", "depicted", "chart", "above", "below", "provided", "discussed", "content", "material", "focus", "axis", "plot", "graph", "labelled", "caption", "heading", "curve", "legend"? If referencing external material $\rightarrow$ REWRITE.
-12. PDF SPREAD: Questions cover beginning, middle, AND end of the PDF? Concepts from at least 3 sections?
-13. CROSS-PAGE INTEGRATION: For Hard AR, A and R should ideally connect concepts from DIFFERENT parts of the PDF — e.g., Assertion about a property from one section + Reason about a mechanism from another.
-14. CONCEPT DIVERSITY: No two questions test same concept. No question pattern repeated more than twice.
+1. A requires mechanism-level understanding (not recall)?
+2. A described indirectly through properties where possible?
+3. TYPE 1: R gives genuine mechanistic explanation?
+4. TYPE 2: R related but not the mechanism?
+5. TYPE 3: R has subtle mechanistic error?
+6. TYPE 4: A has common misconception?
+7. No source references in questions?
+8. Each question tests a different concept from a different part of the PDF?
+9. Answer distribution balanced and non-predictable?
+10. SOURCE REFERENCE SCAN: Do A or R contain "listed", "sequence", "shown", "given", "table", "figure", "data", "illustrated", "depicted", "chart", "above", "below", "provided", "discussed", "content", "material", "focus", "axis", "plot", "graph", "labelled", "caption", "heading", "curve", "legend"? If referencing external material $\rightarrow$ REWRITE.
+11. PDF SPREAD: Questions cover beginning, middle, AND end of the PDF? Concepts from at least 3 sections?
+12. At least 30% cross-page connections?
+13. CONCEPT DIVERSITY: No two questions test same concept. No question pattern repeated more than twice.
+14. No vague statements (no "generally", "sometimes", "may")?
 
 If ANY fails $\rightarrow$ regenerate.
 
@@ -1965,6 +2047,23 @@ ANSWER VERIFICATION:
 If any fails $\rightarrow$ fix. If unsure about a pairing $\rightarrow$ remove that question.
 
 ------------------------------------------------------------
+------------------------------------------------------------
+ANSWER CORRECTNESS (EASY MTC — #1 PRIORITY)
+
+ACCURACY > QUANTITY. Generate fewer correct questions rather than more wrong ones.
+- Each List I item MUST match exactly ONE List II item. No item should plausibly match 2 items.
+- The correct option (1 out of 4) must have ALL 4 pairings correct. The other 3 options must have at least 1 wrong pairing.
+- TEST: Can a student argue that a different matching is also correct? If yes $\rightarrow$ rewrite.
+- Every fact must match the PDF. If unsure about a pairing $\rightarrow$ skip that question.
+
+------------------------------------------------------------
+PAGE COVERAGE (EASY MTC)
+
+Each question MUST draw List I items from DIFFERENT parts of the PDF — not all from the same paragraph.
+No two consecutive MTC questions from the same page.
+NEVER make all questions from the first 2-3 pages — this is a HARD FAILURE.
+
+------------------------------------------------------------
 VALIDATION CHECKLIST (verify EACH question)
 
 1. Exactly 4 pairs, one-to-one mapping?
@@ -1980,6 +2079,7 @@ VALIDATION CHECKLIST (verify EACH question)
 11. ALL 4 OPTIONS ARE UNIQUE? Compare (1)vs(2), (1)vs(3), (1)vs(4), (2)vs(3), (2)vs(4), (3)vs(4) — if ANY pair is identical $\rightarrow$ change the duplicate option.
 12. TOPIC DIVERSITY CHECK: When generating multiple questions, does this question test a DIFFERENT matching dimension than the other questions? If two questions test the same dimension (e.g., both are element↔configuration) $\rightarrow$ change one to a different dimension.
 13. PDF SPREAD: Matching pairs drawn from DIFFERENT sections of the PDF? Not all from the same paragraph?
+14. Can a student argue a different matching is correct? If yes $\rightarrow$ REWRITE.
 
 If ANY fails $\rightarrow$ regenerate."""
 
@@ -2243,6 +2343,22 @@ Correct answers MUST be randomly and roughly equally distributed across A, B, C,
 - Before outputting: count correct answers per letter. If any letter > 40% or any letter = 0 $\rightarrow$ reshuffle options to fix.
 
 ------------------------------------------------------------
+ANSWER CORRECTNESS (MEDIUM MTC — #1 PRIORITY)
+
+ACCURACY > QUANTITY. Generate fewer correct questions rather than more wrong ones.
+- Each List I item MUST match exactly ONE List II item. No item should plausibly match 2 items.
+- The correct option must have ALL 4 pairings correct. The other 3 must have at least 1 wrong pairing.
+- TEST: Can a student argue that a different matching is also correct? If yes $\rightarrow$ rewrite.
+- Every pairing must match the PDF. If unsure about a pairing $\rightarrow$ skip that question.
+
+------------------------------------------------------------
+CROSS-PAGE CONNECTIONS (MANDATORY — 20%)
+
+At least 20% of questions MUST connect concepts from DIFFERENT sections of the PDF.
+List I items should come from different parts of the PDF — not all from one paragraph.
+NEVER make all questions from the first 2-3 pages — this is a HARD FAILURE.
+
+------------------------------------------------------------
 ANSWER VERIFICATION:
 1. DUPLICATE CHECK: Are all 4 List II items DIFFERENT? If any two identical $\rightarrow$ REWRITE.
 2. PAIR CHECK: Verify each pair (A↔?, B↔?, C↔?, D↔?) matches the PDF content.
@@ -2265,6 +2381,8 @@ VALIDATION CHECKLIST (verify EACH question)
 11. ALL 4 OPTIONS ARE UNIQUE? Compare (1)vs(2), (1)vs(3), (1)vs(4), (2)vs(3), (2)vs(4), (3)vs(4) — if ANY pair is identical $\rightarrow$ change the duplicate option.
 12. TOPIC DIVERSITY CHECK: When generating multiple questions, does this question test a DIFFERENT conceptual relationship than the other questions? If two questions use the same matching dimension $\rightarrow$ change one.
 13. PDF SPREAD: Matching pairs drawn from DIFFERENT sections of the PDF? Not all from the same paragraph?
+14. At least 20% cross-page connections?
+15. Can a student argue a different matching is correct? If yes $\rightarrow$ REWRITE.
 
 If ANY fails $\rightarrow$ regenerate."""
 
@@ -2670,6 +2788,22 @@ LIST ITEM LENGTH RULES (CRITICAL)
   BAD: "$Cr_2O_7^{{2-}}$ + 2 $OH^-$ $\rightleftharpoons$ 2 $CrO_4^{{2-}}$ + $H_2O$; hydroxide converts dichromate into chromate"
   GOOD: "Dichromate $\rightarrow$ chromate conversion"
 ------------------------------------------------------------
+ANSWER CORRECTNESS (HARD MTC — #1 PRIORITY)
+
+ACCURACY > QUANTITY. Generate fewer correct questions rather than more wrong ones.
+- Each List I item MUST match exactly ONE List II item. No item should plausibly match 2 items.
+- The correct option must have ALL 4 pairings correct. The other 3 must have at least 1 wrong pairing.
+- TEST: Can a student argue that a different matching is also correct? If yes $\rightarrow$ rewrite.
+- Every pairing must match the PDF. If unsure about a pairing $\rightarrow$ skip that question.
+
+------------------------------------------------------------
+CROSS-PAGE CONNECTIONS (MANDATORY — 30%)
+
+At least 30% of questions MUST integrate concepts from DIFFERENT sections of the PDF.
+List I items should come from different parts of the PDF — creating true multi-concept depth.
+NEVER make all questions from the first 2-3 pages — this is a HARD FAILURE.
+
+------------------------------------------------------------
 ANSWER VERIFICATION:
 1. DUPLICATE CHECK: Are all 4 List II items DIFFERENT? If any two identical $\rightarrow$ REWRITE.
 2. PAIR CHECK: Verify each pair (A↔?, B↔?, C↔?, D↔?) matches the PDF content.
@@ -2716,7 +2850,7 @@ TOPIC DIVERSITY CHECK (when generating multiple questions):
 
 PDF SPREAD & CROSS-PAGE:
 23. Matching pairs drawn from DIFFERENT sections of the PDF? Not all from the same paragraph?
-24. For Hard MTC: Do List I items integrate concepts from DIFFERENT parts of the PDF? This creates true depth.
+24. At least 30% cross-page connections? List I items integrate concepts from DIFFERENT parts of the PDF?
 
 If ANY fails $\rightarrow$ regenerate."""
 

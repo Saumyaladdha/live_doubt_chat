@@ -1,5 +1,6 @@
 """
 Streamlit UI for Testing NEET Question Generator
+Multi-PDF support, Excel export, and Review & Comment workflow.
 """
 
 import logging
@@ -24,6 +25,7 @@ import streamlit as st
 import json
 
 from test_generator import generate_neet_test_from_pdf
+from excel_export import generate_excel_for_result, read_excel_for_review, update_excel_with_comments
 
 # Page config
 st.set_page_config(
@@ -306,6 +308,56 @@ section[data-testid="stSidebar"] .stDivider {
     border-radius: 6px;
     border: 1px solid #E2E8F0;
 }
+
+/* ---------- PDF Config Card ---------- */
+.pdf-config-card {
+    background: #F8FAFC;
+    border: 1px solid #E2E8F0;
+    border-radius: 10px;
+    padding: 1rem 1.25rem;
+    margin-bottom: 0.75rem;
+}
+.pdf-config-title {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #1E293B;
+    margin-bottom: 0.25rem;
+}
+.pdf-config-meta {
+    font-size: 0.75rem;
+    color: #64748B;
+}
+
+/* ---------- Review Card ---------- */
+.review-card {
+    background: #FFFFFF;
+    border: 1px solid #E2E8F0;
+    border-radius: 14px;
+    padding: 1.5rem;
+    margin-bottom: 1.25rem;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+}
+.review-answer {
+    background: #ECFDF5;
+    border: 1px solid #6EE7B7;
+    border-radius: 8px;
+    padding: 0.5rem 1rem;
+    font-weight: 600;
+    color: #065F46;
+    display: inline-block;
+    margin: 0.5rem 0;
+}
+
+/* ---------- Tab Styling ---------- */
+.stTabs [data-baseweb="tab-list"] {
+    gap: 8px;
+}
+.stTabs [data-baseweb="tab"] {
+    font-weight: 600;
+    font-size: 0.95rem;
+    padding: 0.5rem 1.5rem;
+    border-radius: 8px 8px 0 0;
+}
 </style>
 """, unsafe_allow_html=True)
 
@@ -320,84 +372,55 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-# Initialize session state
-if "generator_result" not in st.session_state:
-    st.session_state.generator_result = None
-if "generation_time" not in st.session_state:
-    st.session_state.generation_time = None
-
+# ============================================================
+# SESSION STATE INITIALIZATION
+# ============================================================
+if "pdf_configs" not in st.session_state:
+    st.session_state.pdf_configs = {}  # {filename: {pdf_bytes, page_count, difficulty, question_type, question_count}}
+if "pdf_order" not in st.session_state:
+    st.session_state.pdf_order = []
+if "results" not in st.session_state:
+    st.session_state.results = {}  # {filename: {result, generation_time, excel_bytes, excel_filename}}
+if "review_data" not in st.session_state:
+    st.session_state.review_data = None  # {filename, questions, question_type, excel_bytes}
 
 # Load API key from environment variable
 api_key = os.getenv("OPENAI_API_KEY")
 model = "gpt-5-mini"
 max_completion_tokens = 80000
 
-# ============================================================
-# SIDEBAR
-# ============================================================
-with st.sidebar:
-    st.markdown('<div class="sidebar-section">PDF Input</div>', unsafe_allow_html=True)
-
-    uploaded_file = st.file_uploader(
-        "Upload PDF",
-        type=["pdf"],
-        accept_multiple_files=False,
-        help="Upload a textbook chapter PDF (max 50MB, up to 1000 pages)",
-        label_visibility="collapsed"
-    )
-
-    pdf_bytes = None
-    if uploaded_file is not None:
-        pdf_bytes = uploaded_file.getvalue()
-        file_size_mb = len(pdf_bytes) / (1024 * 1024)
-        st.success(f"Uploaded: {uploaded_file.name} ({file_size_mb:.1f} MB)")
-
-        if file_size_mb > 50:
-            st.error("PDF is too large. Maximum size is 50MB.")
-            pdf_bytes = None
-
-    st.divider()
-    st.markdown('<div class="sidebar-section">Configuration</div>', unsafe_allow_html=True)
-
-    subject = st.selectbox(
-        "Subject",
-        ["biology", "chemistry"],
-        index=0,
-        format_func=lambda x: x.title()
-    )
-
-    col_diff, col_type = st.columns(2)
-    with col_diff:
-        difficulty = st.selectbox(
-            "Difficulty",
-            ["easy", "medium", "hard"],
-            index=2
-        )
-    with col_type:
-        question_type = st.selectbox(
-            "Type",
-            ["combination", "mcq", "assertion_reason", "match_the_column"],
-            index=0,
-            format_func=lambda x: {
-                "combination": "Mixed",
-                "mcq": "MCQ",
-                "assertion_reason": "A-R",
-                "match_the_column": "Match"
-            }.get(x, x)
-        )
-
-    question_count = st.number_input(
-        "Number of Questions",
-        min_value=1,
-        max_value=100,
-        value=5,
-        step=1,
-    )
-
 
 # ============================================================
 # HELPER FUNCTIONS
 # ============================================================
+
+def _count_pdf_pages(pdf_bytes: bytes) -> int:
+    """Count pages in a PDF."""
+    try:
+        from pypdf import PdfReader
+        import io
+        reader = PdfReader(io.BytesIO(pdf_bytes))
+        return len(reader.pages)
+    except Exception:
+        return 0
+
+
+def _make_excel_filename(metadata: dict, page_count: int) -> str:
+    """Generate filename: {pages}page_{difficulty}_{type}_{count}questions.xlsx"""
+    pages = page_count or metadata.get("page_count", 0)
+    difficulty = metadata.get("difficulty", "medium")
+    qtype = metadata.get("question_type", "mcq")
+    total = metadata.get("total_questions", 0)
+
+    type_names = {
+        "mcq": "mcq",
+        "assertion_reason": "ar",
+        "match_the_column": "mtc",
+        "combination": "mixed",
+    }
+    type_str = type_names.get(qtype, qtype)
+    return f"{pages}page_{difficulty}_{type_str}_{total}questions.xlsx"
+
 
 def render_match_the_column(text: str):
     """Dedicated renderer for Match the Column questions. Handles all formats."""
@@ -487,7 +510,6 @@ def render_match_the_column(text: str):
         st.markdown(f"**{text}**")
 
 
-
 def render_latex_text(text: str):
     """Render text that may contain LaTeX."""
     if '\\begin{tabular}' in text or 'begin{tabular}' in text:
@@ -531,7 +553,7 @@ def render_latex_text(text: str):
             st.markdown(f"**{formatted}**")
 
 
-def render_test_view(result: dict):
+def render_test_view(result: dict, generation_time: float = None):
     """Render questions in a polished test paper view."""
 
     if "parse_error" in result:
@@ -543,9 +565,8 @@ def render_test_view(result: dict):
     if "test_metadata" in result:
         meta = result["test_metadata"]
 
-        # Stat cards
         # Format generation time
-        gen_time = st.session_state.get('generation_time')
+        gen_time = generation_time
         if gen_time is not None:
             if gen_time >= 60:
                 time_str = f"{int(gen_time // 60)}m {int(gen_time % 60)}s"
@@ -591,7 +612,7 @@ def render_test_view(result: dict):
             cost = token_usage.get('cost', {})
             total_cost = cost.get('total_cost', 0)
 
-            cost_label = f" — Cost: ₹{total_cost:.2f}" if total_cost else ""
+            cost_label = f" — Cost: Rs.{total_cost:.2f}" if total_cost else ""
             with st.expander(f"Token Usage & Pricing — Total: {grand_total:,}{cost_label}" if grand_total else "Token Usage & Pricing"):
                 tok_cols = st.columns(3)
                 with tok_cols[0]:
@@ -605,16 +626,16 @@ def render_test_view(result: dict):
                 with tok_cols[1]:
                     st.markdown("**Pricing (GPT-5 mini)**")
                     if cost:
-                        st.markdown(f"- Input: **₹{cost.get('input_cost', 0):.2f}** ({cost.get('input_rate', '')})")
-                        st.markdown(f"- Output: **₹{cost.get('output_cost', 0):.2f}** ({cost.get('output_rate', '')})")
-                        st.markdown(f"- **Total: ₹{total_cost:.2f}**")
+                        st.markdown(f"- Input: **Rs.{cost.get('input_cost', 0):.2f}** ({cost.get('input_rate', '')})")
+                        st.markdown(f"- Output: **Rs.{cost.get('output_cost', 0):.2f}** ({cost.get('output_rate', '')})")
+                        st.markdown(f"- **Total: Rs.{total_cost:.2f}**")
                     else:
                         st.markdown("N/A")
                 with tok_cols[2]:
                     st.markdown("**Summary**")
                     st.markdown(f"- Grand Total Tokens: **{grand_total:,}**")
                     if total_cost:
-                        st.markdown(f"- **Estimated Cost: ₹{total_cost:.2f}**")
+                        st.markdown(f"- **Estimated Cost: Rs.{total_cost:.2f}**")
                     if gen_t:
                         st.markdown(f"- Generation Time: **{gen_t}s**")
 
@@ -656,13 +677,11 @@ def render_test_view(result: dict):
             # Pre-process statement line breaks
             q_text = re.sub(r'\s*(Statement\s+(?:I{1,3}|IV|[1-4])\s*:)', r'  \n\1', q_text).strip()
 
-            # Question text — st.markdown renders LaTeX $...$ natively
+            # Question text
             if q_type == 'MATCH_THE_COLUMN':
                 render_match_the_column(q_text)
             else:
-                # Normalize escaped newlines
                 formatted = q_text.replace('\\n\\n', '\n\n').replace('\\n', '\n')
-                # Bold non-empty lines
                 if '\n' in formatted:
                     lines = []
                     for line in formatted.split('\n'):
@@ -677,7 +696,7 @@ def render_test_view(result: dict):
 
             st.write("")
 
-            # Options — st.markdown renders LaTeX $...$ in options too
+            # Options
             if "options" in q:
                 options = q["options"]
                 for key in ['a', 'b', 'c', 'd']:
@@ -697,69 +716,343 @@ def render_test_view(result: dict):
 
 
 # ============================================================
-# MAIN CONTENT
+# SIDEBAR
 # ============================================================
-has_pdf = pdf_bytes is not None
+with st.sidebar:
+    st.markdown('<div class="sidebar-section">PDF Input</div>', unsafe_allow_html=True)
 
-if not has_pdf:
-    st.markdown("""
-    <div class="empty-state">
-        <div class="empty-state-icon">📄</div>
-        <div class="empty-state-title">No PDF uploaded yet</div>
-        <div class="empty-state-text">Upload a textbook PDF in the sidebar to get started</div>
-    </div>
-    """, unsafe_allow_html=True)
-else:
-    # Action button
-    generate_btn = st.button(
-        "Generate Test",
-        type="primary",
-        use_container_width=True,
-        icon="🚀"
+    uploaded_files = st.file_uploader(
+        "Upload PDFs",
+        type=["pdf"],
+        accept_multiple_files=True,
+        help="Upload one or more textbook PDFs (max 50MB each)",
+        label_visibility="collapsed"
     )
 
-    st.markdown("")
+    # Process uploaded files — sync pdf_configs with uploaded_files
+    current_filenames = set()
+    if uploaded_files:
+        for uf in uploaded_files:
+            current_filenames.add(uf.name)
+            if uf.name not in st.session_state.pdf_configs:
+                pdf_bytes = uf.getvalue()
+                file_size_mb = len(pdf_bytes) / (1024 * 1024)
+                if file_size_mb > 50:
+                    st.error(f"{uf.name} is too large ({file_size_mb:.1f} MB). Max 50MB.")
+                    continue
+                page_count = _count_pdf_pages(pdf_bytes)
+                st.session_state.pdf_configs[uf.name] = {
+                    "pdf_bytes": pdf_bytes,
+                    "page_count": page_count,
+                    "file_size_mb": file_size_mb,
+                    "difficulty": "easy",
+                    "question_type": "combination",
+                    "question_count": 5,
+                }
+                if uf.name not in st.session_state.pdf_order:
+                    st.session_state.pdf_order.append(uf.name)
 
-    # --- Generate Test ---
-    if generate_btn:
-        logger.info("=== Generate Test button clicked ===")
-        if not api_key:
-            logger.warning("No API key provided")
-            st.error("Please set your OPENAI_API_KEY environment variable in .env")
-        else:
-            logger.info(f"Starting generation: subject={subject}, difficulty={difficulty}, type={question_type}, count={question_count}")
-            with st.spinner(f"Generating {question_count} questions from PDF..."):
-                start_time = time.time()
-                try:
-                    result = generate_neet_test_from_pdf(
-                        pdf_bytes=pdf_bytes,
-                        subject=subject,
-                        difficulty=difficulty,
-                        question_count=question_count,
-                        question_type=question_type,
-                        model=model,
-                        max_completion_tokens=max_completion_tokens,
-                        api_key=api_key,
+    # Remove configs for files that were un-uploaded
+    removed = [fn for fn in st.session_state.pdf_order if fn not in current_filenames]
+    for fn in removed:
+        st.session_state.pdf_configs.pop(fn, None)
+        st.session_state.results.pop(fn, None)
+    st.session_state.pdf_order = [fn for fn in st.session_state.pdf_order if fn in current_filenames]
+
+    if st.session_state.pdf_order:
+        st.success(f"{len(st.session_state.pdf_order)} PDF(s) uploaded")
+
+    st.divider()
+    st.markdown('<div class="sidebar-section">Global Settings</div>', unsafe_allow_html=True)
+
+    subject = st.selectbox(
+        "Subject",
+        ["biology", "chemistry"],
+        index=0,
+        format_func=lambda x: x.title()
+    )
+
+
+# ============================================================
+# MAIN CONTENT — TABS
+# ============================================================
+tab_generate, tab_review = st.tabs(["Generate Questions", "Review & Comment"])
+
+
+# ============================================================
+# TAB 1: GENERATE QUESTIONS
+# ============================================================
+with tab_generate:
+    if not st.session_state.pdf_order:
+        st.markdown("""
+        <div class="empty-state">
+            <div class="empty-state-icon">📄</div>
+            <div class="empty-state-title">No PDFs uploaded yet</div>
+            <div class="empty-state-text">Upload one or more textbook PDFs in the sidebar to get started</div>
+        </div>
+        """, unsafe_allow_html=True)
+    else:
+        # --- Per-PDF Configuration Cards ---
+        st.markdown("### Configure Each PDF")
+        for fname in st.session_state.pdf_order:
+            cfg = st.session_state.pdf_configs[fname]
+            with st.expander(f"**{fname}** — {cfg['page_count']} pages, {cfg['file_size_mb']:.1f} MB", expanded=True):
+                c1, c2, c3 = st.columns(3)
+                with c1:
+                    cfg["difficulty"] = st.selectbox(
+                        "Difficulty",
+                        ["easy", "medium", "hard"],
+                        index=["easy", "medium", "hard"].index(cfg.get("difficulty", "easy")),
+                        key=f"diff_{fname}"
+                    )
+                with c2:
+                    type_options = ["combination", "mcq", "assertion_reason", "match_the_column"]
+                    type_labels = {"combination": "Mixed", "mcq": "MCQ", "assertion_reason": "A-R", "match_the_column": "Match"}
+                    cfg["question_type"] = st.selectbox(
+                        "Type",
+                        type_options,
+                        index=type_options.index(cfg.get("question_type", "combination")),
+                        format_func=lambda x: type_labels.get(x, x),
+                        key=f"type_{fname}"
+                    )
+                with c3:
+                    cfg["question_count"] = st.number_input(
+                        "Questions",
+                        min_value=1,
+                        max_value=100,
+                        value=cfg.get("question_count", 5),
+                        step=1,
+                        key=f"count_{fname}"
                     )
 
-                    elapsed = time.time() - start_time
-                    if result:
-                        logger.info(f"Generation complete! Got {len(result.get('questions', []))} questions in {elapsed:.1f}s")
-                        st.session_state.generator_result = result
-                        st.session_state.generation_time = elapsed
+        st.markdown("")
+
+        # --- Generate All Tests Button ---
+        generate_btn = st.button(
+            f"Generate Tests for {len(st.session_state.pdf_order)} PDF(s)",
+            type="primary",
+            use_container_width=True,
+            icon="🚀"
+        )
+
+        if generate_btn:
+            if not api_key:
+                st.error("Please set your OPENAI_API_KEY environment variable in .env or Streamlit secrets.")
+            else:
+                total_pdfs = len(st.session_state.pdf_order)
+                overall_start = time.time()
+
+                for pdf_idx, fname in enumerate(st.session_state.pdf_order):
+                    cfg = st.session_state.pdf_configs[fname]
+                    with st.status(f"[{pdf_idx + 1}/{total_pdfs}] Generating {cfg['question_count']} questions from {fname}...", expanded=True) as status:
+                        st.write(f"Subject: {subject.title()} | Difficulty: {cfg['difficulty'].title()} | Type: {cfg['question_type'].replace('_', ' ').title()}")
+                        start_time = time.time()
+                        try:
+                            result = generate_neet_test_from_pdf(
+                                pdf_bytes=cfg["pdf_bytes"],
+                                subject=subject,
+                                difficulty=cfg["difficulty"],
+                                question_count=cfg["question_count"],
+                                question_type=cfg["question_type"],
+                                model=model,
+                                max_completion_tokens=max_completion_tokens,
+                                api_key=api_key,
+                            )
+
+                            elapsed = time.time() - start_time
+
+                            if result:
+                                # Generate Excel
+                                excel_bytes = generate_excel_for_result(result)
+                                meta = result.get("test_metadata", {})
+                                excel_filename = _make_excel_filename(meta, cfg["page_count"])
+
+                                st.session_state.results[fname] = {
+                                    "result": result,
+                                    "generation_time": elapsed,
+                                    "excel_bytes": excel_bytes,
+                                    "excel_filename": excel_filename,
+                                }
+
+                                num_q = len(result.get("questions", []))
+                                status.update(label=f"[{pdf_idx + 1}/{total_pdfs}] {fname} — {num_q} questions in {elapsed:.1f}s", state="complete")
+                            else:
+                                status.update(label=f"[{pdf_idx + 1}/{total_pdfs}] {fname} — No result returned", state="error")
+
+                        except Exception as e:
+                            import traceback
+                            elapsed = time.time() - start_time
+                            logger.error(f"Generation failed for {fname} after {elapsed:.1f}s: {type(e).__name__}: {e}")
+                            logger.error(traceback.format_exc())
+                            status.update(label=f"[{pdf_idx + 1}/{total_pdfs}] {fname} — Error: {e}", state="error")
+                            st.code(traceback.format_exc())
+
+                overall_elapsed = time.time() - overall_start
+                st.success(f"All {total_pdfs} PDF(s) processed in {overall_elapsed:.1f}s")
+
+        # --- Results Display ---
+        for fname in st.session_state.pdf_order:
+            if fname in st.session_state.results:
+                res_data = st.session_state.results[fname]
+                result = res_data["result"]
+                gen_time = res_data["generation_time"]
+                excel_bytes = res_data["excel_bytes"]
+                excel_filename = res_data["excel_filename"]
+
+                st.markdown(f"---")
+                st.markdown(f"### Results: {fname}")
+
+                # Download button for Excel
+                st.download_button(
+                    label=f"Download Excel: {excel_filename}",
+                    data=excel_bytes,
+                    file_name=excel_filename,
+                    mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                    key=f"dl_{fname}",
+                    type="secondary",
+                    use_container_width=True,
+                )
+
+                st.markdown("")
+
+                # Render the test view
+                render_test_view(result, generation_time=gen_time)
+
+                with st.expander("Raw JSON"):
+                    st.code(json.dumps(result, indent=2, ensure_ascii=False), language="json")
+
+
+# ============================================================
+# TAB 2: REVIEW & COMMENT
+# ============================================================
+with tab_review:
+    st.markdown("### Upload Excel for Review")
+    st.markdown("Upload a previously exported Excel file to review questions, add accuracy ratings and comments, then re-download.")
+
+    review_file = st.file_uploader(
+        "Upload Excel",
+        type=["xlsx"],
+        accept_multiple_files=False,
+        help="Upload an Excel file exported from the Generate tab",
+        key="review_uploader",
+        label_visibility="collapsed"
+    )
+
+    if review_file is not None:
+        review_bytes = review_file.getvalue()
+
+        # Parse Excel
+        try:
+            questions, overall_type = read_excel_for_review(review_bytes)
+        except Exception as e:
+            st.error(f"Failed to read Excel: {e}")
+            questions = []
+            overall_type = "UNKNOWN"
+
+        if questions:
+            type_display = {
+                "MCQ": "MCQ",
+                "ASSERTION_REASON": "Assertion-Reason",
+                "MATCH_THE_COLUMN": "Match the Column",
+                "COMBINATION": "Mixed (Multiple Types)",
+            }
+            st.markdown(f"""
+            <div class="info-banner">
+                <span>&#9432;</span> Detected <strong>{len(questions)}</strong> questions — Type: <strong>{type_display.get(overall_type, overall_type)}</strong>
+            </div>
+            """, unsafe_allow_html=True)
+
+            # Initialize comments and accuracies in session state
+            if "review_comments" not in st.session_state or st.session_state.get("_review_file") != review_file.name:
+                st.session_state.review_comments = {}
+                st.session_state.review_accuracies = {}
+                st.session_state._review_file = review_file.name
+                # Pre-populate from Excel if already filled
+                for i, q in enumerate(questions):
+                    st.session_state.review_comments[i] = q.get("comment", "") or ""
+                    st.session_state.review_accuracies[i] = q.get("accuracy", "") or ""
+
+            # Display each question as a review card
+            for idx, q in enumerate(questions):
+                qtype = q.get("_type", "MCQ")
+
+                st.markdown(f"""
+                <div class="review-card">
+                    <div class="q-header">
+                        <span class="q-number">Q{idx + 1}</span>
+                        <span class="q-type-badge">{type_display.get(qtype, qtype)}</span>
+                    </div>
+                </div>
+                """, unsafe_allow_html=True)
+
+                # Render question content by type
+                if qtype == "MCQ":
+                    st.markdown(f"**{q.get('question_text', '')}**")
+                    opts = q.get("options", {})
+                    for key in ["a", "b", "c", "d"]:
+                        if key in opts and opts[key]:
+                            st.markdown(f"- **{key.upper()}.** {opts[key]}")
+                elif qtype == "ASSERTION_REASON":
+                    st.markdown(f"**Assertion (A):** {q.get('assertion', '')}")
+                    st.markdown(f"**Reason (R):** {q.get('reason', '')}")
+                elif qtype == "MATCH_THE_COLUMN":
+                    st.markdown(f"**List I:** {q.get('list_i', '')}")
+                    st.markdown(f"**List II:** {q.get('list_ii', '')}")
+
+                # Correct answer
+                answer = q.get("correct_answer", "")
+                if answer:
+                    st.markdown(f'<div class="review-answer">Correct Answer: {answer}</div>', unsafe_allow_html=True)
+
+                # Explanation in expander
+                explanation = q.get("explanation", "")
+                if explanation:
+                    with st.expander("Explanation"):
+                        st.markdown(explanation)
+
+                # Accuracy and Comment inputs
+                acc_col, comment_col = st.columns([1, 3])
+                with acc_col:
+                    accuracy_options = ["", "Correct", "Incorrect", "Partially Correct", "Needs Review"]
+                    current_acc = st.session_state.review_accuracies.get(idx, "")
+                    acc_index = accuracy_options.index(current_acc) if current_acc in accuracy_options else 0
+                    st.session_state.review_accuracies[idx] = st.selectbox(
+                        "Accuracy",
+                        accuracy_options,
+                        index=acc_index,
+                        key=f"acc_{idx}",
+                    )
+                with comment_col:
+                    st.session_state.review_comments[idx] = st.text_area(
+                        "Comment",
+                        value=st.session_state.review_comments.get(idx, ""),
+                        key=f"comment_{idx}",
+                        height=80,
+                        placeholder="Add your comment here..."
+                    )
+
+                st.markdown("")
+
+            # Save & Download button
+            st.markdown("---")
+            if st.button("Save Comments & Download", type="primary", use_container_width=True, icon="💾"):
+                try:
+                    updated_bytes = update_excel_with_comments(
+                        review_bytes,
+                        st.session_state.review_comments,
+                        st.session_state.review_accuracies,
+                    )
+                    st.download_button(
+                        label="Download Updated Excel",
+                        data=updated_bytes,
+                        file_name=f"reviewed_{review_file.name}",
+                        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                        key="dl_reviewed",
+                        type="secondary",
+                        use_container_width=True,
+                    )
+                    st.success("Comments and accuracy saved! Click the download button above.")
                 except Exception as e:
-                    import traceback
-                    elapsed = time.time() - start_time
-                    logger.error(f"Generation failed after {elapsed:.1f}s: {type(e).__name__}: {e}")
-                    logger.error(traceback.format_exc())
-                    st.error(f"Error: {type(e).__name__}: {e}")
-                    st.code(traceback.format_exc())
-
-# ============================================================
-# RESULTS DISPLAY
-# ============================================================
-if st.session_state.generator_result:
-    render_test_view(st.session_state.generator_result)
-
-    with st.expander("Raw JSON"):
-        st.code(json.dumps(st.session_state.generator_result, indent=2, ensure_ascii=False), language="json")
+                    st.error(f"Failed to update Excel: {e}")
+        elif review_file:
+            st.warning("No questions found in the uploaded Excel file. Make sure it was exported from the Generate tab.")

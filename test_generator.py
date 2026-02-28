@@ -734,8 +734,8 @@ def generate_neet_test_from_pdf(
                 chunk_q, chunk_max_tokens, temperature, chunk_label
             )
 
-        # Run all chunks in parallel
-        with ThreadPoolExecutor(max_workers=len(chunks)) as executor:
+        # Run all chunks in parallel (cap at 3 workers to avoid OpenAI rate limits)
+        with ThreadPoolExecutor(max_workers=min(3, len(chunks))) as executor:
             results = list(executor.map(_run_chunk, chunks))
 
         # Merge results from all chunks
@@ -862,7 +862,11 @@ def generate_neet_test_from_pdf(
         result["test_metadata"]["total_questions"] = len(result["questions"])
         result["test_metadata"]["requested_questions"] = question_count
         result["test_metadata"]["question_type"] = question_type
+        result["test_metadata"]["subject"] = subject
+        result["test_metadata"]["difficulty"] = difficulty
+        result["test_metadata"]["topic"] = effective_type.replace("_", " ").title()
         result["test_metadata"]["generation_time"] = generation_time
+        result["test_metadata"]["page_count"] = total_pages
         result["test_metadata"]["parallel_chunks"] = len(chunks) if use_parallel else 1
         cost = calculate_cost(token_usage) if token_usage else {}
         result["test_metadata"]["token_usage"] = {
