@@ -75,6 +75,14 @@ def latex_to_unicode(text: str) -> str:
     # \times → ×
     text = text.replace('\\times', '\u00d7')
 
+    # LaTeX spacing commands → space: \; \, \: \! \quad \qquad
+    text = re.sub(r'\\[;,:\!]', ' ', text)
+    text = text.replace('\\quad', ' ')
+    text = text.replace('\\qquad', '  ')
+
+    # Semicolons used as separator in configs like d¹⁰;ns² → d¹⁰ ns²
+    text = text.replace(';', ' ')
+
     # ^{...} → superscript
     text = re.sub(r'\^{([^}]*)}', lambda m: _to_superscript(m.group(1)), text)
 
@@ -153,6 +161,16 @@ def _auto_width(ws):
         ws.column_dimensions[letter].width = min(max(max_len + 2, 10), 60)
 
 
+def _source_info(q: dict) -> tuple:
+    """Extract (page_or_section, key_concepts_str) from question's source_info."""
+    si = q.get("source_info") or {}
+    page = si.get("page_or_section", "")
+    concepts = si.get("key_concepts", [])
+    if isinstance(concepts, list):
+        concepts = ", ".join(str(c) for c in concepts if c)
+    return _clean(str(page)), _clean(str(concepts))
+
+
 def _add_meta_row(ws, row: int, col_start: int, metadata: dict):
     """Add Time, token, and cost columns. Populated on EVERY row."""
     token_usage = metadata.get("token_usage", {})
@@ -209,21 +227,21 @@ def _parse_mtc(question_text: str):
 
 MCQ_HEADERS = [
     "Question Number", "Question", "Option A", "Option B", "Option C", "Option D",
-    "Correct Answer", "Accuracy", "Comment",
+    "Correct Answer", "Key Concepts", "Page/Section", "Accuracy", "Comment",
     "Time to Run", "Input Tokens", "Output Tokens",
     "Input Cost (Rs)", "Output Cost (Rs)"
 ]
 
 AR_HEADERS = [
     "Question Number", "Assertion (A)", "Reason (R)", "Correct Answer",
-    "Accuracy", "Comment",
+    "Key Concepts", "Page/Section", "Accuracy", "Comment",
     "Time to Run", "Input Tokens", "Output Tokens",
     "Input Cost (Rs)", "Output Cost (Rs)"
 ]
 
 MTC_HEADERS = [
     "Question Number", "List I", "List II", "Correct Answer",
-    "Accuracy", "Comment",
+    "Key Concepts", "Page/Section", "Accuracy", "Comment",
     "Time to Run", "Input Tokens", "Output Tokens",
     "Input Cost (Rs)", "Output Cost (Rs)"
 ]
@@ -244,8 +262,11 @@ def _build_mcq_sheet(ws, questions: list, metadata: dict):
         ws.cell(row=row, column=5).value = _clean(opts.get("c", ""))
         ws.cell(row=row, column=6).value = _clean(opts.get("d", ""))
         ws.cell(row=row, column=7).value = (q.get("correct_answer") or "").upper()
-        # 8=Accuracy, 9=Comment left blank
-        _add_meta_row(ws, row, 10, metadata)
+        concepts, page = _source_info(q)
+        ws.cell(row=row, column=8).value = concepts
+        ws.cell(row=row, column=9).value = page
+        # 10=Accuracy, 11=Comment left blank
+        _add_meta_row(ws, row, 12, metadata)
 
         for c in range(1, len(MCQ_HEADERS) + 1):
             ws.cell(row=row, column=c).alignment = _CELL_ALIGN
@@ -265,8 +286,11 @@ def _build_ar_sheet(ws, questions: list, metadata: dict):
         ws.cell(row=row, column=2).value = assertion
         ws.cell(row=row, column=3).value = reason
         ws.cell(row=row, column=4).value = (q.get("correct_answer") or "").upper()
-        # 5=Accuracy, 6=Comment left blank
-        _add_meta_row(ws, row, 7, metadata)
+        concepts, page = _source_info(q)
+        ws.cell(row=row, column=5).value = concepts
+        ws.cell(row=row, column=6).value = page
+        # 7=Accuracy, 8=Comment left blank
+        _add_meta_row(ws, row, 9, metadata)
 
         for c in range(1, len(AR_HEADERS) + 1):
             ws.cell(row=row, column=c).alignment = _CELL_ALIGN
@@ -286,8 +310,11 @@ def _build_mtc_sheet(ws, questions: list, metadata: dict):
         ws.cell(row=row, column=2).value = list_i
         ws.cell(row=row, column=3).value = list_ii
         ws.cell(row=row, column=4).value = (q.get("correct_answer") or "").upper()
-        # 5=Accuracy, 6=Comment left blank
-        _add_meta_row(ws, row, 7, metadata)
+        concepts, page = _source_info(q)
+        ws.cell(row=row, column=5).value = concepts
+        ws.cell(row=row, column=6).value = page
+        # 7=Accuracy, 8=Comment left blank
+        _add_meta_row(ws, row, 9, metadata)
 
         for c in range(1, len(MTC_HEADERS) + 1):
             ws.cell(row=row, column=c).alignment = _CELL_ALIGN
@@ -384,29 +411,33 @@ def read_excel_for_review(excel_bytes: bytes) -> tuple:
 
             q = {"_type": qtype, "_sheet": sheet_name, "_row": row[0].row}
 
+            # Common fields (header_map handles column position automatically)
+            def _val(col_name, fallback_idx=None):
+                idx = header_map.get(col_name, fallback_idx)
+                return (vals[idx] if idx is not None and idx < len(vals) else None) or ""
+
             if qtype == "MCQ":
-                q["question_text"] = vals[header_map.get("Question", 1)] or ""
+                q["question_text"] = _val("Question", 1)
                 q["options"] = {
-                    "a": vals[header_map.get("Option A", 2)] or "",
-                    "b": vals[header_map.get("Option B", 3)] or "",
-                    "c": vals[header_map.get("Option C", 4)] or "",
-                    "d": vals[header_map.get("Option D", 5)] or "",
+                    "a": _val("Option A", 2),
+                    "b": _val("Option B", 3),
+                    "c": _val("Option C", 4),
+                    "d": _val("Option D", 5),
                 }
-                q["correct_answer"] = vals[header_map.get("Correct Answer", 6)] or ""
-                q["accuracy"] = vals[header_map.get("Accuracy", 7)] or ""
-                q["comment"] = vals[header_map.get("Comment", 8)] or ""
+                q["correct_answer"] = _val("Correct Answer", 6)
             elif qtype == "ASSERTION_REASON":
-                q["assertion"] = vals[header_map.get("Assertion (A)", 1)] or ""
-                q["reason"] = vals[header_map.get("Reason (R)", 2)] or ""
-                q["correct_answer"] = vals[header_map.get("Correct Answer", 3)] or ""
-                q["accuracy"] = vals[header_map.get("Accuracy", 4)] or ""
-                q["comment"] = vals[header_map.get("Comment", 5)] or ""
+                q["assertion"] = _val("Assertion (A)", 1)
+                q["reason"] = _val("Reason (R)", 2)
+                q["correct_answer"] = _val("Correct Answer", 3)
             elif qtype == "MATCH_THE_COLUMN":
-                q["list_i"] = vals[header_map.get("List I", 1)] or ""
-                q["list_ii"] = vals[header_map.get("List II", 2)] or ""
-                q["correct_answer"] = vals[header_map.get("Correct Answer", 3)] or ""
-                q["accuracy"] = vals[header_map.get("Accuracy", 4)] or ""
-                q["comment"] = vals[header_map.get("Comment", 5)] or ""
+                q["list_i"] = _val("List I", 1)
+                q["list_ii"] = _val("List II", 2)
+                q["correct_answer"] = _val("Correct Answer", 3)
+
+            q["key_concepts"] = _val("Key Concepts")
+            q["page_section"] = _val("Page/Section")
+            q["accuracy"] = _val("Accuracy")
+            q["comment"] = _val("Comment")
 
             all_questions.append(q)
 
