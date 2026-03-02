@@ -2019,6 +2019,35 @@ List II: I. "Mentioned as an industrially important metal" AND II. "Mentioned as
 This has TWO duplicate pairs $\rightarrow$ the question is completely BROKEN. Every List II item must be a UNIQUE, SPECIFIC chemistry fact.
 
 ------------------------------------------------------------
+NO KEYWORD OVERLAP BETWEEN LIST I AND LIST II (CRITICAL — INSTANT FAIL)
+
+If a student can match items by just spotting the SAME WORD in List I and List II, the question tests reading skill, NOT chemistry. This is the #2 most common bug after sequential answers.
+
+BAD (keyword giveaway):
+List I: A. Li  B. Ca  C. Cl  D. Al
+List II: I. Member of the Cl–Br–I triad  II. Not in Dobereiner's triads  III. Member of the Li–Na–K triad  IV. Member of the Ca–Sr–Ba triad
+$\rightarrow$ Student sees "Li" in List I $\rightarrow$ spots "Li" in "Li–Na–K" $\rightarrow$ matched without knowing ANY chemistry.
+
+GOOD (no keyword overlap — tests actual knowledge):
+List I: A. Li  B. Ca  C. Cl  D. Al
+List II: I. Alkali metal triad with Na and K  II. Halogen triad with Br and I  III. Not part of any Dobereiner triad  IV. Alkaline earth metal triad with Sr and Ba
+$\rightarrow$ Even better: use a property that requires recall, not name-matching.
+
+BEST (completely different dimensions — no possible keyword match):
+List I: A. $Na_2CO_3$  B. $CaCO_3$  C. $K_2Cr_2O_7$  D. $KMnO_4$
+List II: I. Washing soda  II. Limestone  III. Orange crystals  IV. Purple solution
+$\rightarrow$ Student must recall common names and physical properties. Zero keyword overlap.
+
+SELF-CHECK: For each List I item, scan ALL List II items. If the List I item's name/formula appears ANYWHERE in a List II item $\rightarrow$ REWRITE that List II item to describe the property WITHOUT repeating the name.
+
+NO PARENTHETICAL HINTS IN LIST ITEMS (CRITICAL):
+NEVER add clarifying labels like "(predicted)", "(found)", "(modern name)", "(old name)", "(actual)" in List I or List II.
+BAD: "I. Eka-aluminium (predicted)" — the "(predicted)" is a free hint telling the student it's about Mendeleev's predictions.
+BAD: "A. Gallium (found)" — "(found)" gives away context.
+GOOD: "I. Eka-aluminium" — just the term, no parenthetical hint.
+If context is needed, it belongs in the question HEADER, not inside list items.
+
+------------------------------------------------------------
 TOPIC DIVERSITY (MANDATORY WHEN GENERATING MULTIPLE QUESTIONS)
 
 When generating 2+ MTC Easy questions, each question MUST test a DIFFERENT matching dimension.
@@ -2314,6 +2343,12 @@ HOW TO BUILD 4 UNIQUE OPTIONS:
 3. VERIFY: Write out all 4 options and check character-by-character that no two are the same
 
 BEFORE finalizing: Compare every pair $\rightarrow$ (a)vs(b), (a)vs(c), (a)vs(d), (b)vs(c), (b)vs(d), (c)vs(d). If ANY pair matches $\rightarrow$ change the duplicate.
+
+------------------------------------------------------------
+NO KEYWORD OVERLAP BETWEEN LIST I AND LIST II (CRITICAL)
+
+If a List I item's name/formula appears in any List II item, the student matches by reading, not by knowing chemistry.
+SELF-CHECK: For each List I item, scan ALL List II items. If the name appears $\rightarrow$ REWRITE that List II description without repeating it.
 
 ------------------------------------------------------------
 TOPIC DIVERSITY (MANDATORY WHEN GENERATING MULTIPLE QUESTIONS)
@@ -2646,6 +2681,12 @@ HOW TO BUILD 4 UNIQUE OPTIONS:
 3. VERIFY: Write out all 4 options and check character-by-character that no two are the same
 
 BEFORE finalizing: Compare every pair $\rightarrow$ (a)vs(b), (a)vs(c), (a)vs(d), (b)vs(c), (b)vs(d), (c)vs(d). If ANY pair matches $\rightarrow$ change the duplicate.
+
+------------------------------------------------------------
+NO KEYWORD OVERLAP BETWEEN LIST I AND LIST II (CRITICAL)
+
+If a List I item's name/formula appears in any List II item, the student matches by reading, not by knowing chemistry.
+SELF-CHECK: For each List I item, scan ALL List II items. If the name appears $\rightarrow$ REWRITE that List II description without repeating it.
 
 ------------------------------------------------------------
 TOPIC DIVERSITY (MANDATORY WHEN GENERATING MULTIPLE QUESTIONS)
