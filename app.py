@@ -22,27 +22,11 @@ logger = logging.getLogger(__name__)
 import re
 import time
 import uuid
-import base64
 import streamlit as st
-import streamlit.components.v1 as components
 import json
 
 from test_generator import generate_neet_test_from_pdf
 from excel_export import generate_excel_for_result, read_excel_for_review, update_excel_with_comments, latex_to_unicode
-
-
-def auto_download(data: bytes, filename: str):
-    """Auto-trigger a file download via JavaScript so the file lands on the user's
-    computer immediately — no button click needed, survives session refresh."""
-    b64 = base64.b64encode(data).decode()
-    mime = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-    components.html(
-        f'''<html><body>
-        <a id="dl" href="data:{mime};base64,{b64}" download="{filename}"></a>
-        <script>document.getElementById("dl").click();</script>
-        </body></html>''',
-        height=0,
-    )
 
 # Page config
 st.set_page_config(
@@ -410,7 +394,6 @@ if "gen_subject" not in st.session_state:
     st.session_state.gen_subject = "biology"  # Subject captured at generation start
 if "gen_errors" not in st.session_state:
     st.session_state.gen_errors = {}  # {slot_id: error_message}
-
 # Load API key from environment variable
 api_key = os.getenv("OPENAI_API_KEY")
 model = "gpt-5-mini"
@@ -1001,10 +984,6 @@ with tab_generate:
                                 "excel_bytes": excel_bytes,
                                 "excel_filename": excel_filename,
                             }
-
-                            # Auto-download immediately — file lands on user's computer
-                            # even if session dies before they click a button
-                            auto_download(excel_bytes, excel_filename)
 
                             num_q = len(result.get("questions", []))
                             status.update(label=f"[{idx + 1}/{total_slots}] {label} — {num_q} questions in {elapsed:.1f}s", state="complete")
