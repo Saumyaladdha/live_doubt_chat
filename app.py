@@ -386,6 +386,14 @@ if "results" not in st.session_state:
     st.session_state.results = {}  # {slot_id: {result, generation_time, excel_bytes, excel_filename}}
 if "review_data" not in st.session_state:
     st.session_state.review_data = None  # {filename, questions, question_type, excel_bytes}
+if "generating" not in st.session_state:
+    st.session_state.generating = False  # True while generation loop is active
+if "gen_slot_idx" not in st.session_state:
+    st.session_state.gen_slot_idx = 0  # Index of next slot to process
+if "gen_subject" not in st.session_state:
+    st.session_state.gen_subject = "biology"  # Subject captured at generation start
+if "gen_errors" not in st.session_state:
+    st.session_state.gen_errors = {}  # {slot_id: error_message}
 
 # Load API key from environment variable
 api_key = os.getenv("OPENAI_API_KEY")
@@ -883,105 +891,123 @@ with tab_generate:
 
         st.markdown("")
 
-        # --- Generate All Tests Button ---
-        generate_btn = st.button(
-            f"Generate Tests for {len(st.session_state.slot_order)} Slot(s)",
-            type="primary",
-            use_container_width=True,
-            icon="🚀"
-        )
+        # --- Generate / Stop Buttons ---
+        if st.session_state.generating:
+            total_slots = len(st.session_state.slot_order)
+            done = st.session_state.gen_slot_idx
+            st.progress(done / total_slots, text=f"Processing slot {done + 1} of {total_slots}...")
+            if st.button("Stop Generation", type="secondary", use_container_width=True):
+                st.session_state.generating = False
+                st.rerun()
+        else:
+            generate_btn = st.button(
+                f"Generate Tests for {len(st.session_state.slot_order)} Slot(s)",
+                type="primary",
+                use_container_width=True,
+                icon="🚀"
+            )
+            if generate_btn:
+                if not api_key:
+                    st.error("Please set your OPENAI_API_KEY environment variable in .env or Streamlit secrets.")
+                else:
+                    st.session_state.generating = True
+                    st.session_state.gen_slot_idx = 0
+                    st.session_state.gen_subject = subject
+                    st.session_state.gen_errors = {}
+                    st.rerun()
 
-        if generate_btn:
-            if not api_key:
-                st.error("Please set your OPENAI_API_KEY environment variable in .env or Streamlit secrets.")
-            else:
-                total_slots = len(st.session_state.slot_order)
-                overall_start = time.time()
+        # --- Process ONE slot per rerun cycle (survives Streamlit re-renders) ---
+        if st.session_state.generating:
+            total_slots = len(st.session_state.slot_order)
+            idx = st.session_state.gen_slot_idx
 
-                for slot_idx, slot_id in enumerate(st.session_state.slot_order):
-                    slot = st.session_state.slots[slot_id]
-                    fname = slot["filename"]
-                    pdf_info = st.session_state.pdf_files[fname]
-                    label = f"{fname} [{slot['difficulty']}/{slot['question_type']}]"
-
-                    with st.status(f"[{slot_idx + 1}/{total_slots}] Generating {slot['question_count']} questions from {label}...", expanded=True) as status:
-                        st.write(f"Subject: {subject.title()} | Difficulty: {slot['difficulty'].title()} | Type: {slot['question_type'].replace('_', ' ').title()}")
-                        start_time = time.time()
-                        try:
-                            result = generate_neet_test_from_pdf(
-                                pdf_bytes=pdf_info["pdf_bytes"],
-                                subject=subject,
-                                difficulty=slot["difficulty"],
-                                question_count=slot["question_count"],
-                                question_type=slot["question_type"],
-                                model=model,
-                                max_completion_tokens=max_completion_tokens,
-                                api_key=api_key,
-                            )
-
-                            elapsed = time.time() - start_time
-
-                            if result:
-                                # Generate Excel
-                                excel_bytes = generate_excel_for_result(result)
-                                meta = result.get("test_metadata", {})
-                                excel_filename = _make_excel_filename(meta, pdf_info["page_count"])
-
-                                st.session_state.results[slot_id] = {
-                                    "result": result,
-                                    "generation_time": elapsed,
-                                    "excel_bytes": excel_bytes,
-                                    "excel_filename": excel_filename,
-                                }
-
-                                num_q = len(result.get("questions", []))
-                                status.update(label=f"[{slot_idx + 1}/{total_slots}] {label} — {num_q} questions in {elapsed:.1f}s", state="complete")
-                            else:
-                                status.update(label=f"[{slot_idx + 1}/{total_slots}] {label} — No result returned", state="error")
-
-                        except Exception as e:
-                            import traceback
-                            elapsed = time.time() - start_time
-                            logger.error(f"Generation failed for {label} after {elapsed:.1f}s: {type(e).__name__}: {e}")
-                            logger.error(traceback.format_exc())
-                            status.update(label=f"[{slot_idx + 1}/{total_slots}] {label} — Error: {e}", state="error")
-                            st.code(traceback.format_exc())
-
-                overall_elapsed = time.time() - overall_start
-                st.success(f"All {total_slots} slot(s) processed in {overall_elapsed:.1f}s")
-
-        # --- Results Display ---
-        for slot_id in st.session_state.slot_order:
-            if slot_id in st.session_state.results:
+            if idx < total_slots:
+                slot_id = st.session_state.slot_order[idx]
                 slot = st.session_state.slots[slot_id]
                 fname = slot["filename"]
+                pdf_info = st.session_state.pdf_files[fname]
+                label = f"{fname} [{slot['difficulty']}/{slot['question_type']}]"
+
+                with st.status(f"[{idx + 1}/{total_slots}] Generating {slot['question_count']} questions from {label}...", expanded=True) as status:
+                    st.write(f"Subject: {st.session_state.gen_subject.title()} | Difficulty: {slot['difficulty'].title()} | Type: {slot['question_type'].replace('_', ' ').title()}")
+                    start_time = time.time()
+                    try:
+                        result = generate_neet_test_from_pdf(
+                            pdf_bytes=pdf_info["pdf_bytes"],
+                            subject=st.session_state.gen_subject,
+                            difficulty=slot["difficulty"],
+                            question_count=slot["question_count"],
+                            question_type=slot["question_type"],
+                            model=model,
+                            max_completion_tokens=max_completion_tokens,
+                            api_key=api_key,
+                        )
+
+                        elapsed = time.time() - start_time
+
+                        if result and "parse_error" not in result:
+                            excel_bytes = generate_excel_for_result(result)
+                            meta = result.get("test_metadata", {})
+                            excel_filename = _make_excel_filename(meta, pdf_info["page_count"])
+
+                            st.session_state.results[slot_id] = {
+                                "result": result,
+                                "generation_time": elapsed,
+                                "excel_bytes": excel_bytes,
+                                "excel_filename": excel_filename,
+                            }
+
+                            num_q = len(result.get("questions", []))
+                            status.update(label=f"[{idx + 1}/{total_slots}] {label} — {num_q} questions in {elapsed:.1f}s", state="complete")
+                        else:
+                            error_msg = result.get("parse_error", "No result returned") if result else "No result returned"
+                            st.session_state.gen_errors[slot_id] = error_msg
+                            status.update(label=f"[{idx + 1}/{total_slots}] {label} — {error_msg}", state="error")
+
+                    except Exception as e:
+                        import traceback
+                        elapsed = time.time() - start_time
+                        logger.error(f"Generation failed for {label} after {elapsed:.1f}s: {type(e).__name__}: {e}")
+                        logger.error(traceback.format_exc())
+                        st.session_state.gen_errors[slot_id] = str(e)
+                        status.update(label=f"[{idx + 1}/{total_slots}] {label} — Error: {e}", state="error")
+
+                # Move to next slot and rerun
+                st.session_state.gen_slot_idx = idx + 1
+                if idx + 1 < total_slots:
+                    st.rerun()
+                else:
+                    # All done
+                    st.session_state.generating = False
+                    st.rerun()
+
+        # --- Results: Download Buttons Only (no question display) ---
+        completed = [(sid, st.session_state.slots[sid]) for sid in st.session_state.slot_order if sid in st.session_state.results]
+        if completed:
+            st.markdown("---")
+            st.markdown(f"### Downloads ({len(completed)} completed)")
+            for slot_id, slot in completed:
                 res_data = st.session_state.results[slot_id]
-                result = res_data["result"]
-                gen_time = res_data["generation_time"]
                 excel_bytes = res_data["excel_bytes"]
                 excel_filename = res_data["excel_filename"]
+                fname = slot["filename"]
+                num_q = len(res_data["result"].get("questions", []))
 
-                st.markdown(f"---")
-                st.markdown(f"### Results: {fname} — {slot['difficulty'].title()} / {slot['question_type'].replace('_', ' ').title()}")
-
-                # Download button for Excel
                 st.download_button(
-                    label=f"Download Excel: {excel_filename}",
+                    label=f"{excel_filename} — {num_q}q, {res_data['generation_time']:.0f}s",
                     data=excel_bytes,
                     file_name=excel_filename,
                     mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                     key=f"dl_{slot_id}",
-                    type="secondary",
                     use_container_width=True,
                 )
 
-                st.markdown("")
-
-                # Render the test view
-                render_test_view(result, generation_time=gen_time)
-
-                with st.expander("Raw JSON"):
-                    st.code(json.dumps(result, indent=2, ensure_ascii=False), language="json")
+        # --- Show errors if any ---
+        if st.session_state.gen_errors:
+            with st.expander(f"Errors ({len(st.session_state.gen_errors)})", expanded=False):
+                for sid, err in st.session_state.gen_errors.items():
+                    slot = st.session_state.slots.get(sid, {})
+                    st.error(f"{slot.get('filename', '?')} [{slot.get('difficulty', '?')}/{slot.get('question_type', '?')}]: {err}")
 
 
 # ============================================================
