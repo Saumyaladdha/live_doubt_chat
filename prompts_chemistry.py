@@ -42,6 +42,9 @@ Use ONLY facts present in the provided PDF — no training knowledge, no assumpt
 Every fact in questions and options must be traceable to the PDF content.
 If a concept is implied but not explicitly present — do NOT use it. Generate fewer questions rather than inventing content.
 
+OCR / CONTENT CONFIDENCE CHECK:
+If any page contains unreadable text, missing formulas, broken equations, incomplete sentences, or OCR errors that make the chemistry fact unclear — do NOT generate questions from that part. Skip that section entirely. Never reconstruct, infer, or guess missing chemistry facts. If usable facts are fewer than requested questions — generate fewer questions. NEVER hallucinate or supplement with external knowledge.
+
 NO EXACT VALUE RECALL (MCQ / AR ONLY) — NEET students do NOT memorise exact numerical values. Ask TRENDS and COMPARISONS instead.
 This rule applies to MCQ and Assertion-Reason questions ONLY. MTC questions may use numerical values in List II — see MTC-specific rules for when numbers are allowed.
 BAD: "The bond energy of $N_2$ is:", "The lattice enthalpy of NaCl is approximately:" ← asks for exact number
@@ -151,11 +154,24 @@ QUALITY CONTROL RULES (APPLIED TO ALL QUESTIONS)
    - MAX 2 questions out of 10 can use the same question pattern/template
    - For every 5 questions, use AT LEAST 4 different question structures
 
-5. QUESTION CORRECTNESS (UNIVERSAL):
+   DUPLICATE CONCEPT BAN (STRICT):
+   These count as duplicates and are NOT allowed together:
+   - "Electronic configuration of Fe" + "Electronic configuration of Cr" + "Electronic configuration of Cu" ← SAME concept, different element
+   - "Oxidation state of Fe" + "Oxidation state of Cu" ← SAME concept
+   Only 1 question per concept is allowed. Each question must test a DIFFERENT chemistry idea:
+   GOOD diversity: Q1 = Electronic configuration, Q2 = Oxidation state, Q3 = Magnetic property, Q4 = Complex formation, Q5 = Hybridisation
+
+5. DISTRACTOR QUALITY (UNIVERSAL):
+   Distractors must be chemically meaningful alternatives from the same conceptual space.
+   BAD: Hybridisation of methane: A) $sp^3$ B) $sp^2$ C) $sp$ D) $dsp^2$ ← $dsp^2$ is rare/irrelevant, $sp$ is too obviously wrong for 4 bonds
+   GOOD: Hybridisation of methane: A) $sp^3$ B) $sp^2$ C) $sp^3d$ D) $sp^3d^2$ ← all plausible hybridisation types a NEET student encounters
+   Every distractor must be something a student who studied superficially might actually pick.
+
+6. QUESTION CORRECTNESS (UNIVERSAL):
    ACCURACY > QUANTITY. Generate fewer correct questions rather than more wrong ones.
    Every fact must match the PDF. If unsure $\rightarrow$ skip that question.
 
-6. SPREAD ACROSS THE ENTIRE PDF (CRITICAL — #1 QUALITY RULE):
+7. SPREAD ACROSS THE ENTIRE PDF (CRITICAL — #1 QUALITY RULE):
    Read ALL pages of the PDF BEFORE writing a single question.
    Questions MUST come from DIFFERENT pages — beginning, middle, AND end of the PDF.
 
@@ -178,10 +194,10 @@ QUALITY CONTROL RULES (APPLIED TO ALL QUESTIONS)
    If the PDF covers 6 sub-topics $\rightarrow$ spread questions across at least 4-5 of them.
    HARD FAIL: If 80%+ questions come from the same topic/chapter when other topics exist in the PDF $\rightarrow$ REWRITE.
 
-7. RANDOMIZE CORRECT ANSWER POSITION:
+8. RANDOMIZE CORRECT ANSWER POSITION:
    Distribute correct answers roughly equally across A, B, C, D. NEVER put all correct answers in the same position.
 
-8. LaTeX FORMATTING (CRITICAL):
+9. LaTeX FORMATTING (CRITICAL):
    Use inline LaTeX $...$ for ALL chemistry notation. NEVER use plain text or Unicode for formulas.
    GOOD: $4d^{{10}}5s^0$, $H_2SO_4$, $\\Delta H$, $sp^3d^2$, $(n-1)d^{{1-10}} ns^{{1-2}}$, $FeSO_4 \\cdot (NH_4)_2SO_4 \\cdot 6H_2O$
    BAD: $H_2SO_4$, $Fe^{{3+}}$, d1-10, sp3d2 ← plain text or Unicode will not render properly
