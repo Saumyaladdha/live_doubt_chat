@@ -106,9 +106,13 @@ def latex_to_unicode(text: str) -> str:
 # ============================================================
 
 def _clean(text: str) -> str:
-    """Clean text for Excel: convert LaTeX to Unicode, normalize whitespace."""
+    """Clean text for Excel: convert LaTeX to Unicode, normalize whitespace,
+    and strip illegal XML characters that openpyxl cannot write."""
     text = latex_to_unicode(str(text) if text else "")
     text = text.replace('\\n\\n', '\n').replace('\\n', '\n')
+    # Strip characters illegal in XML (openpyxl raises IllegalCharacterError)
+    # Allowed: \t (0x09), \n (0x0A), \r (0x0D), and everything >= 0x20
+    text = re.sub(r'[\x00-\x08\x0b\x0c\x0e-\x1f]', '', text)
     return text.strip()
 
 
