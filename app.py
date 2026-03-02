@@ -21,6 +21,7 @@ logger = logging.getLogger(__name__)
 
 import re
 import time
+import uuid
 import streamlit as st
 import json
 
@@ -375,12 +376,14 @@ st.markdown("""
 # ============================================================
 # SESSION STATE INITIALIZATION
 # ============================================================
-if "pdf_configs" not in st.session_state:
-    st.session_state.pdf_configs = {}  # {filename: {pdf_bytes, page_count, difficulty, question_type, question_count}}
-if "pdf_order" not in st.session_state:
-    st.session_state.pdf_order = []
+if "pdf_files" not in st.session_state:
+    st.session_state.pdf_files = {}  # {filename: {pdf_bytes, page_count, file_size_mb}}
+if "slots" not in st.session_state:
+    st.session_state.slots = {}  # {slot_id: {filename, difficulty, question_type, question_count}}
+if "slot_order" not in st.session_state:
+    st.session_state.slot_order = []  # [slot_id, ...]
 if "results" not in st.session_state:
-    st.session_state.results = {}  # {filename: {result, generation_time, excel_bytes, excel_filename}}
+    st.session_state.results = {}  # {slot_id: {result, generation_time, excel_bytes, excel_filename}}
 if "review_data" not in st.session_state:
     st.session_state.review_data = None  # {filename, questions, question_type, excel_bytes}
 
@@ -731,38 +734,46 @@ with st.sidebar:
         label_visibility="collapsed"
     )
 
-    # Process uploaded files — sync pdf_configs with uploaded_files
+    # Process uploaded files — sync pdf_files and auto-create one slot per new PDF
     current_filenames = set()
     if uploaded_files:
         for uf in uploaded_files:
             current_filenames.add(uf.name)
-            if uf.name not in st.session_state.pdf_configs:
+            if uf.name not in st.session_state.pdf_files:
                 pdf_bytes = uf.getvalue()
                 file_size_mb = len(pdf_bytes) / (1024 * 1024)
                 if file_size_mb > 50:
                     st.error(f"{uf.name} is too large ({file_size_mb:.1f} MB). Max 50MB.")
                     continue
                 page_count = _count_pdf_pages(pdf_bytes)
-                st.session_state.pdf_configs[uf.name] = {
+                st.session_state.pdf_files[uf.name] = {
                     "pdf_bytes": pdf_bytes,
                     "page_count": page_count,
                     "file_size_mb": file_size_mb,
+                }
+                # Auto-create one default slot for this PDF
+                slot_id = str(uuid.uuid4())[:8]
+                st.session_state.slots[slot_id] = {
+                    "filename": uf.name,
                     "difficulty": "easy",
                     "question_type": "combination",
                     "question_count": 5,
                 }
-                if uf.name not in st.session_state.pdf_order:
-                    st.session_state.pdf_order.append(uf.name)
+                st.session_state.slot_order.append(slot_id)
 
-    # Remove configs for files that were un-uploaded
-    removed = [fn for fn in st.session_state.pdf_order if fn not in current_filenames]
-    for fn in removed:
-        st.session_state.pdf_configs.pop(fn, None)
-        st.session_state.results.pop(fn, None)
-    st.session_state.pdf_order = [fn for fn in st.session_state.pdf_order if fn in current_filenames]
+    # Remove files + their slots if un-uploaded
+    removed_files = [fn for fn in list(st.session_state.pdf_files.keys()) if fn not in current_filenames]
+    for fn in removed_files:
+        st.session_state.pdf_files.pop(fn, None)
+        # Remove all slots for this file
+        slots_to_remove = [sid for sid, s in st.session_state.slots.items() if s["filename"] == fn]
+        for sid in slots_to_remove:
+            st.session_state.slots.pop(sid, None)
+            st.session_state.results.pop(sid, None)
+        st.session_state.slot_order = [sid for sid in st.session_state.slot_order if sid in st.session_state.slots]
 
-    if st.session_state.pdf_order:
-        st.success(f"{len(st.session_state.pdf_order)} PDF(s) uploaded")
+    if st.session_state.slot_order:
+        st.success(f"{len(st.session_state.pdf_files)} PDF(s) uploaded — {len(st.session_state.slot_order)} config(s)")
 
     st.divider()
     st.markdown('<div class="sidebar-section">Global Settings</div>', unsafe_allow_html=True)
@@ -785,7 +796,7 @@ tab_generate, tab_review = st.tabs(["Generate Questions", "Review & Comment"])
 # TAB 1: GENERATE QUESTIONS
 # ============================================================
 with tab_generate:
-    if not st.session_state.pdf_order:
+    if not st.session_state.slot_order:
         st.markdown("""
         <div class="empty-state">
             <div class="empty-state-icon">📄</div>
@@ -794,44 +805,87 @@ with tab_generate:
         </div>
         """, unsafe_allow_html=True)
     else:
-        # --- Per-PDF Configuration Cards ---
-        st.markdown("### Configure Each PDF")
-        for fname in st.session_state.pdf_order:
-            cfg = st.session_state.pdf_configs[fname]
-            with st.expander(f"**{fname}** — {cfg['page_count']} pages, {cfg['file_size_mb']:.1f} MB", expanded=True):
-                c1, c2, c3 = st.columns(3)
+        # --- Per-Slot Configuration Cards ---
+        st.markdown("### Configure Generation Slots")
+        st.caption("Each slot generates one test. Add multiple slots from the same PDF for different settings.")
+
+        slots_to_remove = []
+        for slot_id in st.session_state.slot_order:
+            slot = st.session_state.slots[slot_id]
+            fname = slot["filename"]
+            pdf_info = st.session_state.pdf_files.get(fname, {})
+            page_count = pdf_info.get("page_count", 0)
+            file_size = pdf_info.get("file_size_mb", 0)
+
+            with st.expander(f"**{fname}** — {page_count} pages, {file_size:.1f} MB", expanded=True):
+                c1, c2, c3, c4 = st.columns([3, 3, 2, 1])
                 with c1:
-                    cfg["difficulty"] = st.selectbox(
+                    slot["difficulty"] = st.selectbox(
                         "Difficulty",
                         ["easy", "medium", "hard"],
-                        index=["easy", "medium", "hard"].index(cfg.get("difficulty", "easy")),
-                        key=f"diff_{fname}"
+                        index=["easy", "medium", "hard"].index(slot.get("difficulty", "easy")),
+                        key=f"diff_{slot_id}"
                     )
                 with c2:
                     type_options = ["combination", "mcq", "assertion_reason", "match_the_column"]
                     type_labels = {"combination": "Mixed", "mcq": "MCQ", "assertion_reason": "A-R", "match_the_column": "Match"}
-                    cfg["question_type"] = st.selectbox(
+                    slot["question_type"] = st.selectbox(
                         "Type",
                         type_options,
-                        index=type_options.index(cfg.get("question_type", "combination")),
+                        index=type_options.index(slot.get("question_type", "combination")),
                         format_func=lambda x: type_labels.get(x, x),
-                        key=f"type_{fname}"
+                        key=f"type_{slot_id}"
                     )
                 with c3:
-                    cfg["question_count"] = st.number_input(
+                    slot["question_count"] = st.number_input(
                         "Questions",
                         min_value=1,
                         max_value=100,
-                        value=cfg.get("question_count", 5),
+                        value=slot.get("question_count", 5),
                         step=1,
-                        key=f"count_{fname}"
+                        key=f"count_{slot_id}"
                     )
+                with c4:
+                    st.markdown("<div style='height: 28px'></div>", unsafe_allow_html=True)
+                    if st.button("🗑️", key=f"remove_{slot_id}", help="Remove this slot"):
+                        slots_to_remove.append(slot_id)
+
+        # Process removals (but keep at least 1 slot per uploaded PDF)
+        for sid in slots_to_remove:
+            st.session_state.slots.pop(sid, None)
+            st.session_state.results.pop(sid, None)
+            st.session_state.slot_order = [s for s in st.session_state.slot_order if s in st.session_state.slots]
+            st.rerun()
+
+        # --- Add Slot Button ---
+        st.markdown("")
+        available_pdfs = list(st.session_state.pdf_files.keys())
+        if available_pdfs:
+            add_cols = st.columns([4, 1])
+            with add_cols[0]:
+                add_for_pdf = st.selectbox(
+                    "Add slot for PDF",
+                    available_pdfs,
+                    label_visibility="collapsed",
+                    key="add_slot_pdf_select"
+                )
+            with add_cols[1]:
+                if st.button("+ Add Slot", use_container_width=True):
+                    new_slot_id = str(uuid.uuid4())[:8]
+                    st.session_state.slots[new_slot_id] = {
+                        "filename": add_for_pdf,
+                        "difficulty": "easy",
+                        "question_type": "combination",
+                        "question_count": 5,
+                    }
+                    st.session_state.slot_order.append(new_slot_id)
+                    st.rerun()
 
         st.markdown("")
 
         # --- Generate All Tests Button ---
         generate_btn = st.button(
-            f"Generate Tests for {len(st.session_state.pdf_order)} PDF(s)",
+            f"Generate Tests for {len(st.session_state.slot_order)} Slot(s)",
             type="primary",
             use_container_width=True,
             icon="🚀"
@@ -841,21 +895,25 @@ with tab_generate:
             if not api_key:
                 st.error("Please set your OPENAI_API_KEY environment variable in .env or Streamlit secrets.")
             else:
-                total_pdfs = len(st.session_state.pdf_order)
+                total_slots = len(st.session_state.slot_order)
                 overall_start = time.time()
 
-                for pdf_idx, fname in enumerate(st.session_state.pdf_order):
-                    cfg = st.session_state.pdf_configs[fname]
-                    with st.status(f"[{pdf_idx + 1}/{total_pdfs}] Generating {cfg['question_count']} questions from {fname}...", expanded=True) as status:
-                        st.write(f"Subject: {subject.title()} | Difficulty: {cfg['difficulty'].title()} | Type: {cfg['question_type'].replace('_', ' ').title()}")
+                for slot_idx, slot_id in enumerate(st.session_state.slot_order):
+                    slot = st.session_state.slots[slot_id]
+                    fname = slot["filename"]
+                    pdf_info = st.session_state.pdf_files[fname]
+                    label = f"{fname} [{slot['difficulty']}/{slot['question_type']}]"
+
+                    with st.status(f"[{slot_idx + 1}/{total_slots}] Generating {slot['question_count']} questions from {label}...", expanded=True) as status:
+                        st.write(f"Subject: {subject.title()} | Difficulty: {slot['difficulty'].title()} | Type: {slot['question_type'].replace('_', ' ').title()}")
                         start_time = time.time()
                         try:
                             result = generate_neet_test_from_pdf(
-                                pdf_bytes=cfg["pdf_bytes"],
+                                pdf_bytes=pdf_info["pdf_bytes"],
                                 subject=subject,
-                                difficulty=cfg["difficulty"],
-                                question_count=cfg["question_count"],
-                                question_type=cfg["question_type"],
+                                difficulty=slot["difficulty"],
+                                question_count=slot["question_count"],
+                                question_type=slot["question_type"],
                                 model=model,
                                 max_completion_tokens=max_completion_tokens,
                                 api_key=api_key,
@@ -867,9 +925,9 @@ with tab_generate:
                                 # Generate Excel
                                 excel_bytes = generate_excel_for_result(result)
                                 meta = result.get("test_metadata", {})
-                                excel_filename = _make_excel_filename(meta, cfg["page_count"])
+                                excel_filename = _make_excel_filename(meta, pdf_info["page_count"])
 
-                                st.session_state.results[fname] = {
+                                st.session_state.results[slot_id] = {
                                     "result": result,
                                     "generation_time": elapsed,
                                     "excel_bytes": excel_bytes,
@@ -877,32 +935,34 @@ with tab_generate:
                                 }
 
                                 num_q = len(result.get("questions", []))
-                                status.update(label=f"[{pdf_idx + 1}/{total_pdfs}] {fname} — {num_q} questions in {elapsed:.1f}s", state="complete")
+                                status.update(label=f"[{slot_idx + 1}/{total_slots}] {label} — {num_q} questions in {elapsed:.1f}s", state="complete")
                             else:
-                                status.update(label=f"[{pdf_idx + 1}/{total_pdfs}] {fname} — No result returned", state="error")
+                                status.update(label=f"[{slot_idx + 1}/{total_slots}] {label} — No result returned", state="error")
 
                         except Exception as e:
                             import traceback
                             elapsed = time.time() - start_time
-                            logger.error(f"Generation failed for {fname} after {elapsed:.1f}s: {type(e).__name__}: {e}")
+                            logger.error(f"Generation failed for {label} after {elapsed:.1f}s: {type(e).__name__}: {e}")
                             logger.error(traceback.format_exc())
-                            status.update(label=f"[{pdf_idx + 1}/{total_pdfs}] {fname} — Error: {e}", state="error")
+                            status.update(label=f"[{slot_idx + 1}/{total_slots}] {label} — Error: {e}", state="error")
                             st.code(traceback.format_exc())
 
                 overall_elapsed = time.time() - overall_start
-                st.success(f"All {total_pdfs} PDF(s) processed in {overall_elapsed:.1f}s")
+                st.success(f"All {total_slots} slot(s) processed in {overall_elapsed:.1f}s")
 
         # --- Results Display ---
-        for fname in st.session_state.pdf_order:
-            if fname in st.session_state.results:
-                res_data = st.session_state.results[fname]
+        for slot_id in st.session_state.slot_order:
+            if slot_id in st.session_state.results:
+                slot = st.session_state.slots[slot_id]
+                fname = slot["filename"]
+                res_data = st.session_state.results[slot_id]
                 result = res_data["result"]
                 gen_time = res_data["generation_time"]
                 excel_bytes = res_data["excel_bytes"]
                 excel_filename = res_data["excel_filename"]
 
                 st.markdown(f"---")
-                st.markdown(f"### Results: {fname}")
+                st.markdown(f"### Results: {fname} — {slot['difficulty'].title()} / {slot['question_type'].replace('_', ' ').title()}")
 
                 # Download button for Excel
                 st.download_button(
@@ -910,7 +970,7 @@ with tab_generate:
                     data=excel_bytes,
                     file_name=excel_filename,
                     mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                    key=f"dl_{fname}",
+                    key=f"dl_{slot_id}",
                     type="secondary",
                     use_container_width=True,
                 )

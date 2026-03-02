@@ -194,6 +194,9 @@ QUALITY CONTROL RULES (APPLIED TO ALL QUESTIONS)
    If the PDF covers 6 sub-topics $\rightarrow$ spread questions across at least 4-5 of them.
    HARD FAIL: If 80%+ questions come from the same topic/chapter when other topics exist in the PDF $\rightarrow$ REWRITE.
 
+   SINGLE-TOPIC PDF FALLBACK:
+   If the ENTIRE PDF covers only ONE topic (e.g., a single chapter on Coordination Compounds), the 3-zone page spread still applies but topic diversity shifts to SUB-CONCEPTS within that topic. Spread questions across different sub-concepts (e.g., nomenclature, isomerism, bonding, magnetic properties, stability) rather than forcing artificial topic separation. The goal is conceptual breadth within the topic, not page-number diversity.
+
 8. RANDOMIZE CORRECT ANSWER POSITION:
    Distribute correct answers roughly equally across A, B, C, D. NEVER put all correct answers in the same position.
 
@@ -573,23 +576,6 @@ Before producing output, verify:
 12. Exactly 1 correct answer per question — no dual correct?
 
 If any violation exists $\rightarrow$ regenerate internally before output.
-
-------------------------------------------------------------
-DIFFICULTY SEPARATION REFERENCE
-
-EASY:
-Single fact. One recall or one substitution.
-Answerable in under 30 seconds.
-
-MEDIUM:
-Two conceptual steps or comparison.
-30–60 seconds.
-
-HARD:
-Multi-layer reasoning or multi-statement logic.
-60–90 seconds.
-
-If question fits Medium or Hard, simplify to Easy.
 """
 
 
@@ -683,23 +669,25 @@ CATEGORY REQUIREMENTS
 
 MANDATORY DISTRIBUTION — every test MUST use Categories A + C/D/E + B + G:
 
+WEIGHTING PRIORITY: Category G ("How many statements are correct?") is the FASTEST-GROWING NEET format (7 questions in NEET 2025, up from 3 in 2022). FAVOUR this category — when in doubt between categories, choose G.
+
 For 10+ questions:
-- Category A (Statement I/II): 30% (e.g., 3 out of 10)
-- Category G (Multi-statement "Which are correct?"): 20% (e.g., 2 out of 10)
+- Category G (Multi-statement "Which are correct?"): 30% (e.g., 3 out of 10) ← HIGHEST PRIORITY
+- Category A (Statement I/II): 25% (e.g., 2-3 out of 10)
 - Category C/D/E ("Which is correct/NOT correct/INCORRECT"): at least 20% combined (e.g., 2 out of 10)
-- Category B (Conceptual Application): remaining (~30%)
+- Category B (Conceptual Application): remaining (~25%)
 - Use at least 2 different sub-types from C/D/E (e.g., 1× Cat C + 1× Cat D)
 
 For 20+ questions:
-- Category A: 30% (~6 out of 20)
-- Category G: 20% (~4 out of 20)
+- Category G: 30% (~6 out of 20) ← HIGHEST PRIORITY
+- Category A: 25% (~5 out of 20)
 - Category C/D/E: at least 20% (~4 out of 20), use all 3 sub-types
-- Category B: remaining (~30%)
+- Category B: remaining (~25%)
 - Category F ("NOT INCORRECT"): max 1
 
 For 5 questions:
-- Category A: 1-2 questions
-- Category G: at least 1 question
+- Category G: at least 2 questions ← HIGHEST PRIORITY
+- Category A: 1 question
 - Category C or D: at least 1 question
 - Category B: remaining
 
@@ -1091,7 +1079,18 @@ At least 1 trap statement that sounds true but is false.
 
 Multi-step calculation (2-3 steps). Options are 4 numerical values with units.
 Distractors = results of common student errors (forgot unit conversion, wrong formula, sign error).
-Only use when the PDF content has quantitative data.
+Use when the PDF content has quantitative data OR when standard NCERT formulas apply.
+
+SCOPE — numericals can come from ANY branch present in the PDF:
+- Physical Chemistry: Colligative properties, Nernst equation, $\\Delta G = \\Delta H - T\\Delta S$, solution chemistry
+- Inorganic Chemistry: Spin-only magnetic moment $\\mu = \\sqrt{{n(n+2)}}$ BM, oxidation state calculation, EAN, CFSE
+- Organic Chemistry (rare): Degree of unsaturation only — NOT multi-step synthesis calculations
+
+Example (Inorganic — Spin-only Magnetic Moment, NEET 2022 style):
+Q. The spin-only magnetic moments of $[Fe(NH_3)_6]^{{3+}}$ and $[FeF_6]^{{3-}}$ in BM are, respectively:
+(A) 1.73 and 1.73  (B) 5.92 and 1.73  (C) 1.73 and 5.92  (D) 5.92 and 5.92
+Answer: (C). Step 1: Both have $Fe^{{3+}}$ ($3d^5$). Step 2: $NH_3$ = strong field $\\rightarrow$ $t_{{2g}}^5 e_g^0$ $\\rightarrow$ 1 unpaired $\\rightarrow$ $\\mu = \\sqrt{{1 \\times 3}}$ = 1.73 BM. $F^-$ = weak field $\\rightarrow$ $t_{{2g}}^3 e_g^2$ $\\rightarrow$ 5 unpaired $\\rightarrow$ $\\mu = \\sqrt{{5 \\times 7}}$ = 5.92 BM.
+(Trap: (B) = swapped strong/weak field; (A)/(D) = assumed both same spin state)
 
 Example (Colligative Properties):
 Q. 18 g of glucose (molar mass = 180 g/mol) is dissolved in 500 g of water. If $K_f$ = 1.86 K kg $mol^{{-1}}$, $\Delta T_f$ is:
@@ -1109,6 +1108,12 @@ Q. For a reaction with $\\Delta H$ = −57 kJ $mol^{{-1}}$ and $\\Delta S$ = −
 (A) 335 K  (B) 298 K  (C) 170 K  (D) 57 K
 Answer: (A). At equilibrium $\\Delta G$ = 0: T = $\\frac{{\\Delta H}}{{\\Delta S}}$ = $\\frac{{57000}}{{170}}$ = 335 K. Above this, $T\\Delta S$ > $\\Delta H$, so $\\Delta G$ > 0.
 (Trap: (B) = assumed room temperature; (C) = used $\\Delta S$ directly; (D) = used $\\Delta H$ in kJ without converting)
+
+Example (Solution Chemistry — Multi-step chain):
+Q. 6.0 g of urea ($NH_2CONH_2$, molar mass = 60 g $mol^{{-1}}$) is dissolved in 500 g of water. The depression in freezing point of the solution is: (Given: $K_f$ for water = 1.86 K kg $mol^{{-1}}$)
+(A) 0.186°C  (B) 0.372°C  (C) 1.86°C  (D) 0.93°C
+Answer: (B). Step 1: moles = 6/60 = 0.1 mol. Step 2: molality = 0.1/0.5 = 0.2 m. Step 3: $\\Delta T_f = K_f \\times m$ = 1.86 × 0.2 = 0.372°C. (i = 1, urea is non-electrolyte)
+(Trap: (A) = forgot to convert 500 g to 0.5 kg; (C) = used moles directly as molality; (D) = used 1 kg instead of 0.5 kg)
 
 ──── G — CONCEPTUAL REASONING (deep WHY/HOW) ────
 
@@ -2162,7 +2167,7 @@ VALIDATION CHECKLIST (verify EACH question)
 8. All items clearly distinct — no ambiguity?
 9. Uses NTA format? ("Match List I with List II", items A/B/C/D and I/II/III/IV, closing line present)
 10. SOURCE REFERENCE SCAN: Do list items contain "table", "figure", "graph", "plot", "axis", "labelled", "shown", "listed", "discussed", "provided", "passage", "curve", "legend"? If referencing external material $\rightarrow$ REWRITE.
-11. ALL 4 OPTIONS ARE UNIQUE? Compare (1)vs(2), (1)vs(3), (1)vs(4), (2)vs(3), (2)vs(4), (3)vs(4) — if ANY pair is identical $\rightarrow$ change the duplicate option.
+11. ALL 4 OPTIONS ARE UNIQUE? Compare (a)vs(b), (a)vs(c), (a)vs(d), (b)vs(c), (b)vs(d), (c)vs(d) — if ANY pair is identical $\rightarrow$ change the duplicate option.
 12. TOPIC DIVERSITY CHECK: When generating multiple questions, does this question test a DIFFERENT matching dimension than the other questions? If two questions test the same dimension (e.g., both are element↔configuration) $\rightarrow$ change one to a different dimension.
 13. PDF SPREAD: Matching pairs drawn from DIFFERENT sections of the PDF? Not all from the same paragraph?
 14. Can a student argue a different matching is correct? If yes $\rightarrow$ REWRITE.
@@ -2206,10 +2211,10 @@ Header: "Match List I with List II"
 Closing line: "Choose the correct answer from the options given below:"
 
 ------------------------------------------------------------
-TABLE FORMAT (MANDATORY — PLAIN TEXT, NO LaTeX)
+TABLE FORMAT (MANDATORY — USE LaTeX $...$ FOR FORMULAS)
 
 List I | List II
-A. [Compound/Reagent] | I. [Property/Outcome]
+A. [Compound/Reagent using LaTeX: $H_2SO_4$, $Fe^{{2+}}$, $CuSO_4 \\cdot 5H_2O$] | I. [Property/Outcome]
 B. [Compound/Reagent] | II. [Property/Outcome]
 C. [Compound/Reagent] | III. [Property/Outcome]
 D. [Compound/Reagent] | IV. [Property/Outcome]
@@ -2476,7 +2481,7 @@ VALIDATION CHECKLIST (verify EACH question)
 8. No verbatim copy-paste from source?
 9. Uses NTA format? ("Match List I with List II", items A/B/C/D and I/II/III/IV, closing line present)
 10. SOURCE REFERENCE SCAN: Do items contain "table", "figure", "graph", "plot", "axis", "labelled", "shown", "listed", "discussed", "provided", "passage", "curve", "legend"? If referencing external material $\rightarrow$ REWRITE.
-11. ALL 4 OPTIONS ARE UNIQUE? Compare (1)vs(2), (1)vs(3), (1)vs(4), (2)vs(3), (2)vs(4), (3)vs(4) — if ANY pair is identical $\rightarrow$ change the duplicate option.
+11. ALL 4 OPTIONS ARE UNIQUE? Compare (a)vs(b), (a)vs(c), (a)vs(d), (b)vs(c), (b)vs(d), (c)vs(d) — if ANY pair is identical $\rightarrow$ change the duplicate option.
 12. TOPIC DIVERSITY CHECK: When generating multiple questions, does this question test a DIFFERENT conceptual relationship than the other questions? If two questions use the same matching dimension $\rightarrow$ change one.
 13. PDF SPREAD: Matching pairs drawn from DIFFERENT sections of the PDF? Not all from the same paragraph?
 14. At least 20% cross-page connections?
@@ -2538,10 +2543,10 @@ Header: "Match List I with List II"
 Closing line: "Choose the correct answer from the options given below:"
 
 ------------------------------------------------------------
-TABLE FORMAT (MANDATORY — PLAIN TEXT, NO LaTeX)
+TABLE FORMAT (MANDATORY — USE LaTeX $...$ FOR FORMULAS)
 
 List I | List II
-A. [Condition/Process] | I. [Consequence/Outcome]
+A. [Condition/Process using LaTeX: $\\Delta H$, $E^\\circ$, $[Fe(CN)_6]^{{4-}}$] | I. [Consequence/Outcome]
 B. [Condition/Process] | II. [Consequence/Outcome]
 C. [Condition/Process] | III. [Consequence/Outcome]
 D. [Condition/Process] | IV. [Consequence/Outcome]
