@@ -578,27 +578,31 @@ def _split_pdf_pages(pdf_bytes: bytes, start_page: int, end_page: int) -> bytes:
     return output.getvalue()
 
 
-def _build_chunks(total_pages: int, question_count: int, chunk_size: int = 15):
-    """Split pages into chunks and distribute questions proportionally.
+def _build_chunks(total_pages: int, question_count: int, chunk_size: int = 15, overlap: int = 1):
+    """Split pages into chunks with context overlap and distribute questions proportionally.
 
-    Returns list of (start_page, end_page, num_questions) tuples (0-indexed pages).
+    Returns list of (core_start, core_end, pdf_start, pdf_end, num_questions) tuples (0-indexed).
+    - core_start/core_end: pages to generate questions from
+    - pdf_start/pdf_end: pages to send to API (includes overlap for context)
     """
     chunks = []
     for start in range(0, total_pages, chunk_size):
         end = min(start + chunk_size - 1, total_pages - 1)
         chunk_pages = end - start + 1
         chunk_q = max(1, round(question_count * chunk_pages / total_pages))
-        chunks.append([start, end, chunk_q])
+        # Add overlap pages for context (not for question generation)
+        pdf_start = max(0, start - overlap) if start > 0 else 0
+        pdf_end = min(total_pages - 1, end + overlap) if end < total_pages - 1 else end
+        chunks.append([start, end, pdf_start, pdf_end, chunk_q])
 
     # Adjust so total questions match exactly
-    allocated = sum(c[2] for c in chunks)
+    allocated = sum(c[4] for c in chunks)
     diff = question_count - allocated
     if diff != 0:
-        # Add/subtract from the largest chunk
-        largest_idx = max(range(len(chunks)), key=lambda i: chunks[i][2])
-        chunks[largest_idx][2] += diff
+        largest_idx = max(range(len(chunks)), key=lambda i: chunks[i][4])
+        chunks[largest_idx][4] += diff
 
-    return [(c[0], c[1], c[2]) for c in chunks]
+    return [(c[0], c[1], c[2], c[3], c[4]) for c in chunks]
 
 
 def _generate_single_chunk(client, model, pdf_bytes, formatted_prompt, user_instruction,
@@ -688,8 +692,8 @@ def generate_neet_test_from_pdf(
 
     if use_parallel:
         # ── PARALLEL GENERATION (large PDF) ──
-        chunks = _build_chunks(total_pages, question_count, chunk_size=15)
-        logger.info(f"[PARALLEL] Splitting into {len(chunks)} chunks: {[(c[0]+1, c[1]+1, c[2]) for c in chunks]}")
+        chunks = _build_chunks(total_pages, question_count, chunk_size=15, overlap=1)
+        logger.info(f"[PARALLEL] Splitting into {len(chunks)} chunks: {[(f'core p{c[0]+1}-{c[1]+1}', f'pdf p{c[2]+1}-{c[3]+1}', f'{c[4]}q') for c in chunks]}")
         logger.info("=" * 80)
 
         gen_start = time.time()
@@ -697,14 +701,27 @@ def generate_neet_test_from_pdf(
         total_token_usage = {"input_tokens": 0, "output_tokens": 0, "total_tokens": 0}
 
         def _run_chunk(chunk_info):
-            start_page, end_page, chunk_q = chunk_info
-            chunk_label = f"p{start_page+1}-{end_page+1}"
+            core_start, core_end, pdf_start, pdf_end, chunk_q = chunk_info
+            chunk_label = f"p{core_start+1}-{core_end+1}"
 
-            # Split PDF to just this chunk's pages
-            chunk_pdf = _split_pdf_pages(pdf_bytes, start_page, end_page)
+            # Split PDF — includes overlap pages for context
+            chunk_pdf = _split_pdf_pages(pdf_bytes, pdf_start, pdf_end)
 
             # Get prompt for this chunk's question count
             chunk_prompt = prompt_module.get_prompt(effective_type, difficulty, subject, chunk_q)
+
+            # Build context page info for instruction
+            context_pages = []
+            if pdf_start < core_start:
+                context_pages.append(f"page {pdf_start+1}")
+            if pdf_end > core_end:
+                context_pages.append(f"page {pdf_end+1}")
+            context_note = ""
+            if context_pages:
+                context_note = (
+                    f"CONTEXT PAGES ({', '.join(context_pages)}): provided for understanding only — "
+                    "do NOT generate questions from context pages.\n"
+                )
 
             # Build instruction for this chunk
             chunk_instruction = (
@@ -712,9 +729,11 @@ def generate_neet_test_from_pdf(
                 f"from this textbook PDF. Each question MUST test a COMPLETELY DIFFERENT concept — "
                 "no two questions can cover the same topic, fact, or principle even if rephrased.\n\n"
                 "ACCURACY IS #1 PRIORITY — every correct_answer MUST match the PDF. If unsure, skip that question.\n\n"
+                f"CORE PAGES (generate questions ONLY from these): pages {core_start+1}-{core_end+1}.\n"
+                f"{context_note}\n"
                 "RULES:\n"
-                "- Each question tests a DIFFERENT concept from a DIFFERENT page/section.\n"
-                "- Spread across ALL pages of this PDF.\n"
+                "- Each question tests a DIFFERENT concept from a DIFFERENT core page/section.\n"
+                "- Spread across ALL core pages.\n"
                 "- Every question has EXACTLY ONE correct answer. The other 3 must be clearly wrong.\n"
                 "- NO ambiguous questions where 2 options could be correct.\n"
             )
