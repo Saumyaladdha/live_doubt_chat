@@ -916,6 +916,34 @@ with tab_generate:
                     st.session_state.gen_errors = {}
                     st.rerun()
 
+        # --- Results: Download Buttons FIRST (render before blocking API call) ---
+        completed = [(sid, st.session_state.slots[sid]) for sid in st.session_state.slot_order if sid in st.session_state.results]
+        if completed:
+            st.markdown("---")
+            st.markdown(f"### Downloads ({len(completed)} completed)")
+            for slot_id, slot in completed:
+                res_data = st.session_state.results[slot_id]
+                excel_bytes = res_data["excel_bytes"]
+                excel_filename = res_data["excel_filename"]
+                fname = slot["filename"]
+                num_q = len(res_data["result"].get("questions", []))
+
+                st.download_button(
+                    label=f"{excel_filename} — {num_q}q, {res_data['generation_time']:.0f}s",
+                    data=excel_bytes,
+                    file_name=excel_filename,
+                    mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                    key=f"dl_{slot_id}",
+                    use_container_width=True,
+                )
+
+        # --- Show errors if any ---
+        if st.session_state.gen_errors:
+            with st.expander(f"Errors ({len(st.session_state.gen_errors)})", expanded=False):
+                for sid, err in st.session_state.gen_errors.items():
+                    slot = st.session_state.slots.get(sid, {})
+                    st.error(f"{slot.get('filename', '?')} [{slot.get('difficulty', '?')}/{slot.get('question_type', '?')}]: {err}")
+
         # --- Process ONE slot per rerun cycle (survives Streamlit re-renders) ---
         if st.session_state.generating:
             total_slots = len(st.session_state.slot_order)
@@ -980,34 +1008,6 @@ with tab_generate:
                     # All done
                     st.session_state.generating = False
                     st.rerun()
-
-        # --- Results: Download Buttons Only (no question display) ---
-        completed = [(sid, st.session_state.slots[sid]) for sid in st.session_state.slot_order if sid in st.session_state.results]
-        if completed:
-            st.markdown("---")
-            st.markdown(f"### Downloads ({len(completed)} completed)")
-            for slot_id, slot in completed:
-                res_data = st.session_state.results[slot_id]
-                excel_bytes = res_data["excel_bytes"]
-                excel_filename = res_data["excel_filename"]
-                fname = slot["filename"]
-                num_q = len(res_data["result"].get("questions", []))
-
-                st.download_button(
-                    label=f"{excel_filename} — {num_q}q, {res_data['generation_time']:.0f}s",
-                    data=excel_bytes,
-                    file_name=excel_filename,
-                    mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                    key=f"dl_{slot_id}",
-                    use_container_width=True,
-                )
-
-        # --- Show errors if any ---
-        if st.session_state.gen_errors:
-            with st.expander(f"Errors ({len(st.session_state.gen_errors)})", expanded=False):
-                for sid, err in st.session_state.gen_errors.items():
-                    slot = st.session_state.slots.get(sid, {})
-                    st.error(f"{slot.get('filename', '?')} [{slot.get('difficulty', '?')}/{slot.get('question_type', '?')}]: {err}")
 
 
 # ============================================================
