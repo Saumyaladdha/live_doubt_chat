@@ -204,20 +204,44 @@ def _parse_ar(question_text: str):
 # ============================================================
 
 def _parse_mtc(question_text: str):
-    """Extract List I items and List II items from MTC question_text."""
+    """Extract List I items and List II items from MTC question_text.
+
+    Handles the model's pipe-table format:
+      A. [item] | I. [item]
+      B. [item] | II. [item]
+    Also handles \\n literal newlines and various separators.
+    """
     text = str(question_text) if question_text else ""
+    # Normalize escaped newlines
+    text = text.replace('\\n\\n', '\n').replace('\\n', '\n')
+
     list_i_items = []
     list_ii_items = []
 
-    # Try pipe-table format: "A. xxx | I. yyy"
-    pairs = re.findall(r'([A-D])\.\s*(.*?)\s*\|\s*(IV|III|II|I)\.\s*(.*?)(?=\s+[A-D]\.\s|\s*Choose|\s*$)', text)
-    if pairs:
-        for letter, l1, roman, l2 in pairs:
+    # Try pipe-table format line by line: "A. xxx | I. yyy"
+    for line in text.split('\n'):
+        line = line.strip()
+        m = re.match(
+            r'([A-E])\.\s*(.*?)\s*\|\s*(IV|III|II|I|V)\.\s*(.*)',
+            line
+        )
+        if m:
+            letter, l1, roman, l2 = m.groups()
+            # Clean trailing "Choose..." from last item
+            l2 = re.sub(r'\s*Choose\s+the\s+correct.*$', '', l2, flags=re.IGNORECASE).strip()
             list_i_items.append(f"{letter}. {_clean(l1)}")
             list_ii_items.append(f"{roman}. {_clean(l2)}")
+
+    if list_i_items:
         return "\n".join(list_i_items), "\n".join(list_ii_items)
 
-    # Fallback: return full text as List I
+    # Fallback: try to find "List I" and "List II" sections
+    li_match = re.search(r'List\s*I\s*[:\-]?\s*(.*?)(?=List\s*II|$)', text, re.DOTALL | re.IGNORECASE)
+    lii_match = re.search(r'List\s*II\s*[:\-]?\s*(.*?)(?=Choose|Select|$)', text, re.DOTALL | re.IGNORECASE)
+    if li_match and lii_match:
+        return _clean(li_match.group(1).strip()), _clean(lii_match.group(1).strip())
+
+    # Last fallback: return full text as List I
     return _clean(text), ""
 
 
@@ -233,14 +257,18 @@ MCQ_HEADERS = [
 ]
 
 AR_HEADERS = [
-    "Question Number", "Assertion (A)", "Reason (R)", "Correct Answer",
+    "Question Number", "Assertion (A)", "Reason (R)",
+    "Option A", "Option B", "Option C", "Option D",
+    "Correct Answer",
     "Key Concepts", "Page/Section", "Accuracy", "Comment",
     "Time to Run", "Input Tokens", "Output Tokens",
     "Input Cost (Rs)", "Output Cost (Rs)"
 ]
 
 MTC_HEADERS = [
-    "Question Number", "List I", "List II", "Correct Answer",
+    "Question Number", "List I", "List II",
+    "Option A", "Option B", "Option C", "Option D",
+    "Correct Answer",
     "Key Concepts", "Page/Section", "Accuracy", "Comment",
     "Time to Run", "Input Tokens", "Output Tokens",
     "Input Cost (Rs)", "Output Cost (Rs)"
@@ -279,18 +307,31 @@ def _build_ar_sheet(ws, questions: list, metadata: dict):
         ws.cell(row=1, column=col, value=h)
     _style_headers(ws, len(AR_HEADERS))
 
+    # Standard AR options fallback
+    _AR_DEFAULT_OPTIONS = {
+        "a": "Both Assertion and Reason are true and Reason is the correct explanation of Assertion",
+        "b": "Both Assertion and Reason are true but Reason is NOT the correct explanation of Assertion",
+        "c": "Assertion is true but Reason is false",
+        "d": "Assertion is false but Reason is true",
+    }
+
     for idx, q in enumerate(questions):
         row = idx + 2
         assertion, reason = _parse_ar(q.get("question_text", ""))
+        opts = q.get("options") or _AR_DEFAULT_OPTIONS
         ws.cell(row=row, column=1).value = q.get("question_id", idx + 1)
         ws.cell(row=row, column=2).value = assertion
         ws.cell(row=row, column=3).value = reason
-        ws.cell(row=row, column=4).value = (q.get("correct_answer") or "").upper()
+        ws.cell(row=row, column=4).value = _clean(opts.get("a", _AR_DEFAULT_OPTIONS["a"]))
+        ws.cell(row=row, column=5).value = _clean(opts.get("b", _AR_DEFAULT_OPTIONS["b"]))
+        ws.cell(row=row, column=6).value = _clean(opts.get("c", _AR_DEFAULT_OPTIONS["c"]))
+        ws.cell(row=row, column=7).value = _clean(opts.get("d", _AR_DEFAULT_OPTIONS["d"]))
+        ws.cell(row=row, column=8).value = (q.get("correct_answer") or "").upper()
         concepts, page = _source_info(q)
-        ws.cell(row=row, column=5).value = concepts
-        ws.cell(row=row, column=6).value = page
-        # 7=Accuracy, 8=Comment left blank
-        _add_meta_row(ws, row, 9, metadata)
+        ws.cell(row=row, column=9).value = concepts
+        ws.cell(row=row, column=10).value = page
+        # 11=Accuracy, 12=Comment left blank
+        _add_meta_row(ws, row, 13, metadata)
 
         for c in range(1, len(AR_HEADERS) + 1):
             ws.cell(row=row, column=c).alignment = _CELL_ALIGN
@@ -306,15 +347,20 @@ def _build_mtc_sheet(ws, questions: list, metadata: dict):
     for idx, q in enumerate(questions):
         row = idx + 2
         list_i, list_ii = _parse_mtc(q.get("question_text", ""))
+        opts = q.get("options", {})
         ws.cell(row=row, column=1).value = q.get("question_id", idx + 1)
         ws.cell(row=row, column=2).value = list_i
         ws.cell(row=row, column=3).value = list_ii
-        ws.cell(row=row, column=4).value = (q.get("correct_answer") or "").upper()
+        ws.cell(row=row, column=4).value = _clean(opts.get("a", ""))
+        ws.cell(row=row, column=5).value = _clean(opts.get("b", ""))
+        ws.cell(row=row, column=6).value = _clean(opts.get("c", ""))
+        ws.cell(row=row, column=7).value = _clean(opts.get("d", ""))
+        ws.cell(row=row, column=8).value = (q.get("correct_answer") or "").upper()
         concepts, page = _source_info(q)
-        ws.cell(row=row, column=5).value = concepts
-        ws.cell(row=row, column=6).value = page
-        # 7=Accuracy, 8=Comment left blank
-        _add_meta_row(ws, row, 9, metadata)
+        ws.cell(row=row, column=9).value = concepts
+        ws.cell(row=row, column=10).value = page
+        # 11=Accuracy, 12=Comment left blank
+        _add_meta_row(ws, row, 13, metadata)
 
         for c in range(1, len(MTC_HEADERS) + 1):
             ws.cell(row=row, column=c).alignment = _CELL_ALIGN
@@ -428,11 +474,27 @@ def read_excel_for_review(excel_bytes: bytes) -> tuple:
             elif qtype == "ASSERTION_REASON":
                 q["assertion"] = _val("Assertion (A)", 1)
                 q["reason"] = _val("Reason (R)", 2)
-                q["correct_answer"] = _val("Correct Answer", 3)
+                # Read options if present (new format with 4 option columns)
+                if "Option A" in header_map:
+                    q["options"] = {
+                        "a": _val("Option A"),
+                        "b": _val("Option B"),
+                        "c": _val("Option C"),
+                        "d": _val("Option D"),
+                    }
+                q["correct_answer"] = _val("Correct Answer")
             elif qtype == "MATCH_THE_COLUMN":
                 q["list_i"] = _val("List I", 1)
                 q["list_ii"] = _val("List II", 2)
-                q["correct_answer"] = _val("Correct Answer", 3)
+                # Read options if present (new format with 4 option columns)
+                if "Option A" in header_map:
+                    q["options"] = {
+                        "a": _val("Option A"),
+                        "b": _val("Option B"),
+                        "c": _val("Option C"),
+                        "d": _val("Option D"),
+                    }
+                q["correct_answer"] = _val("Correct Answer")
 
             q["key_concepts"] = _val("Key Concepts")
             q["page_section"] = _val("Page/Section")

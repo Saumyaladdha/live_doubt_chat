@@ -687,8 +687,9 @@ def render_test_view(result: dict, generation_time: float = None):
             </div>
             """, unsafe_allow_html=True)
 
-            # Pre-process statement line breaks
+            # Pre-process line breaks for Statement I/II and numbered statements (1)(2)(3)(4)
             q_text = re.sub(r'\s*(Statement\s+(?:I{1,3}|IV|[1-4])\s*:)', r'  \n\1', q_text).strip()
+            q_text = re.sub(r'\s*(\([1-9]\))', r'  \n\1', q_text).strip()
 
             # Question text
             if q_type == 'MATCH_THE_COLUMN':
@@ -1075,7 +1076,22 @@ with tab_review:
 
                 # Render question content by type (LaTeX cleaned to Unicode)
                 if qtype == "MCQ":
-                    st.markdown(f"**{latex_to_unicode(q.get('question_text', ''))}**")
+                    mcq_text = latex_to_unicode(q.get('question_text', ''))
+                    # Add line breaks before numbered statements and Statement I/II
+                    mcq_text = re.sub(r'\s*(Statement\s+(?:I{1,3}|IV|[1-4])\s*:)', r'  \n\1', mcq_text).strip()
+                    mcq_text = re.sub(r'\s*(\([1-9]\))', r'  \n\1', mcq_text).strip()
+                    mcq_text = mcq_text.replace('\\n\\n', '\n\n').replace('\\n', '\n')
+                    if '\n' in mcq_text:
+                        mcq_lines = []
+                        for mline in mcq_text.split('\n'):
+                            stripped = mline.strip()
+                            if stripped:
+                                mcq_lines.append(f"**{stripped}**")
+                            else:
+                                mcq_lines.append('')
+                        st.markdown('\n\n'.join(mcq_lines))
+                    else:
+                        st.markdown(f"**{mcq_text}**")
                     opts = q.get("options", {})
                     for key in ["a", "b", "c", "d"]:
                         if key in opts and opts[key]:
@@ -1083,9 +1099,35 @@ with tab_review:
                 elif qtype == "ASSERTION_REASON":
                     st.markdown(f"**Assertion (A):** {latex_to_unicode(q.get('assertion', ''))}")
                     st.markdown(f"**Reason (R):** {latex_to_unicode(q.get('reason', ''))}")
+                    ar_opts = q.get("options", {})
+                    if ar_opts:
+                        for key in ["a", "b", "c", "d"]:
+                            if key in ar_opts and ar_opts[key]:
+                                st.markdown(f"- **({key})** {latex_to_unicode(ar_opts[key])}")
                 elif qtype == "MATCH_THE_COLUMN":
-                    st.markdown(f"**List I:** {latex_to_unicode(q.get('list_i', ''))}")
-                    st.markdown(f"**List II:** {latex_to_unicode(q.get('list_ii', ''))}")
+                    # Render as a proper table
+                    li_raw = q.get('list_i', '')
+                    lii_raw = q.get('list_ii', '')
+                    li_lines = [l.strip() for l in str(li_raw).split('\n') if l.strip()]
+                    lii_lines = [l.strip() for l in str(lii_raw).split('\n') if l.strip()]
+                    if li_lines and lii_lines:
+                        table_md = "| **List I** | **List II** |\n|---|---|\n"
+                        for i in range(max(len(li_lines), len(lii_lines))):
+                            c1 = latex_to_unicode(li_lines[i]) if i < len(li_lines) else ""
+                            c2 = latex_to_unicode(lii_lines[i]) if i < len(lii_lines) else ""
+                            table_md += f"| {c1} | {c2} |\n"
+                        st.markdown(table_md)
+                    else:
+                        if li_raw:
+                            st.markdown(f"**List I:** {latex_to_unicode(li_raw)}")
+                        if lii_raw:
+                            st.markdown(f"**List II:** {latex_to_unicode(lii_raw)}")
+                    # Show matching options
+                    mtc_opts = q.get("options", {})
+                    if mtc_opts:
+                        for key in ["a", "b", "c", "d"]:
+                            if key in mtc_opts and mtc_opts[key]:
+                                st.markdown(f"- **({key})** {latex_to_unicode(mtc_opts[key])}")
 
                 # Correct answer
                 answer = q.get("correct_answer", "")

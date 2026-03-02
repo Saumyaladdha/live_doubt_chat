@@ -1022,6 +1022,21 @@ TEST: Can a student answer it in under 30 seconds from memory? $\rightarrow$ It 
 Every statement in a hard question must contain a REASON or MECHANISM — look for "because", "due to", "since".
 If none of these words appear $\rightarrow$ the statement is probably easy recall disguised as hard.
 
+BANNED — DATA LOOKUP / "WHICH HAS HIGHEST/LOWEST" FROM VALUES (INSTANT REWRITE):
+These are EASY recall, NOT Hard. NEVER generate these at Hard level:
+BAD: "Using tabulated densities: Fe 7.8, Co 8.7, Ni 8.9. Which has the highest density?" ← student just reads the biggest number = EASY
+BAD: "From enthalpies of atomisation: Sc 326, Ti 473, V 515, Cr 397. Which has the largest?" ← student just picks the biggest = EASY
+BAD: "Which element has the highest melting point among Sc, Ti, V, Cr?" ← data recall = EASY
+BAD: "The correct order of ionic radii of $Sc^{{3+}}$, $Ti^{{2+}}$, $Cr^{{3+}}$ is:" ← ordering from memory = MEDIUM at best
+GOOD (Hard version of the same concept): "Among Sc, Ti, V, and Cr, vanadium has the highest enthalpy of atomisation because:"
+(A) It has the maximum number of unpaired d-electrons contributing to metallic bonding
+(B) Its nuclear charge is highest among the four
+(C) It has the strongest d-d orbital overlap due to optimal atomic radius
+(D) Its 4s electrons contribute more to bonding than in other elements
+$\rightarrow$ Tests WHY, not WHAT. Student must reason about d-electron contribution to metallic bonding.
+
+CONVERSION RULE: If you find yourself writing "which has the highest/lowest X?" — CONVERT it to "X has the highest/lowest Y BECAUSE:" with 4 mechanistic options. The BECAUSE is what makes it Hard.
+
 BAD (easy recall in numbered format):
 "1. NaCl shows Schottky defect  2. ZnS shows Frenkel defect  3. CsCl has BCC structure"
 
@@ -1032,8 +1047,39 @@ GOOD (each statement needs reasoning):
 
 ════════════ 7 QUESTION CATEGORIES — DISTRIBUTE EVENLY ════════════
 
-You have 7 categories. Spread questions across them — cycle through different types.
-For 5 questions: at least 3 categories. For 10: at least 4. For 20+: at least 5.
+You have 7 categories (A-G). You MUST use multiple formats — NOT all plain MCQ.
+
+MANDATORY DISTRIBUTION (HARD FAIL if violated):
+
+For 5 questions:
+- Category A or C (multi-statement): at least 1 question ← MANDATORY
+- Category D or E (ordering / T-F): at least 1 question ← MANDATORY
+- Category G (deep WHY/HOW): at least 1 question
+- Remaining from any category
+
+For 10 questions:
+- Category A (Which are correct?): 2 questions
+- Category C (How many are correct?): 2 questions ← HARDEST NEET FORMAT
+- Category D (Arrange in order): 1 question
+- Category E (True/False pattern): 1 question
+- Category F (Numerical): 1 question (only if PDF has quantitative data)
+- Category G (Deep WHY/HOW): 2 questions
+- Category B (Which are incorrect?): 1 question
+
+For 20+ questions:
+- Category A: 4 questions
+- Category C: 4 questions ← HIGHEST PRIORITY
+- Category B: 2 questions
+- Category D: 2 questions
+- Category E: 2 questions
+- Category F: 2 questions (if PDF supports numericals)
+- Category G: 4 questions
+
+HARD FAIL — if ALL questions are plain "X is because:" MCQ (Category G only) with ZERO multi-statement / arrangement / T-F / numerical $\rightarrow$ REWRITE the entire set.
+HARD FAIL — if no question uses numbered statements in the stem $\rightarrow$ at least 30% MUST have numbered statements (Categories A/B/C/E).
+
+CYCLE RULE: Never use the same category for 2 consecutive questions.
+Pattern example: Q1=A, Q2=G, Q3=C, Q4=D, Q5=G, Q6=E, Q7=A, Q8=F, Q9=C, Q10=B
 
 ──── A — WHICH ARE CORRECT? (multi-statement + combination options) ────
 
@@ -1115,24 +1161,42 @@ Q. 6.0 g of urea ($NH_2CONH_2$, molar mass = 60 g $mol^{{-1}}$) is dissolved in 
 Answer: (B). Step 1: moles = 6/60 = 0.1 mol. Step 2: molality = 0.1/0.5 = 0.2 m. Step 3: $\\Delta T_f = K_f \\times m$ = 1.86 × 0.2 = 0.372°C. (i = 1, urea is non-electrolyte)
 (Trap: (A) = forgot to convert 500 g to 0.5 kg; (C) = used moles directly as molality; (D) = used 1 kg instead of 0.5 kg)
 
-──── G — CONCEPTUAL REASONING (deep WHY/HOW) ────
+──── G — CONCEPTUAL REASONING (deep WHY/HOW — NOT simple recall) ────
 
-Single deep question testing WHY or HOW something happens. Requires multi-step logic.
-Options are 4 SHORT answers (1 line each). All must sound plausible.
+Single question testing WHY or HOW a phenomenon occurs. Student must chain 2-3 logical steps to arrive at the answer.
+Options are 4 SHORT mechanistic answers (1 line each). ALL must sound plausible — at least 2 must be common misconceptions.
 
-Example (Inorganic):
+HARD G ≠ EASY G (CRITICAL — READ THIS):
+EASY G: "Chromium has configuration $3d^5 4s^1$ because:" $\rightarrow$ student just recalls "half-filled stability" = ONE STEP = EASY. BANNED in Hard.
+HARD G: "When NaCl is doped with $SrCl_2$, cation vacancies increase. The reason is:" $\rightarrow$ student must reason: (1) $Sr^{{2+}}$ replaces $Na^+$ (2) charge balance requires removing another $Na^+$ (3) this creates a vacancy = THREE STEPS.
+
+CATEGORY G DIFFICULTY TEST (apply to EVERY G question):
+1. Can a student answer it by recalling a single fact? If YES $\rightarrow$ it is EASY, not G. REWRITE.
+2. Does the student need to chain 2+ concepts to reach the answer? If NO $\rightarrow$ REWRITE.
+3. Do at least 2 wrong options represent common student misconceptions? If NO $\rightarrow$ improve distractors.
+
+BANNED G PATTERNS (these are Easy/Medium, NOT Hard):
+- "X has configuration Y because:" ← single-fact recall
+- "X is coloured because:" ← single-fact (d-d transitions)
+- "X is paramagnetic because:" ← single-fact (unpaired electrons)
+- "X is more electronegative than Y because:" ← single-step comparison
+These become Hard ONLY if they involve COMPETING EFFECTS or EXCEPTIONS to the general rule.
+
+Example (Inorganic — multi-step):
 Q. When NaCl is doped with $SrCl_2$, cation vacancies increase. The reason is:
 (A) $Sr^{{2+}}$ occupies an interstitial site, displacing two $Na^+$
 (B) Each $Sr^{{2+}}$ replaces one $Na^+$ and creates one cation vacancy for electrical neutrality
 (C) $Cl^-$ ions leave the lattice to balance the extra charge
 (D) $Sr^{{2+}}$ creates Schottky defects by removing cation-anion pairs
+Why HARD: Student must understand substitutional doping $\rightarrow$ charge imbalance $\rightarrow$ vacancy creation. Options (A), (C), (D) are plausible misconceptions.
 
-Example (Organic — use when PDF has organic content):
+Example (Organic — competing effects):
 Q. Phenol is considerably more acidic than ethanol. The most appropriate reason is:
 (A) The $O-H$ bond in phenol is weaker due to the $sp^2$ carbon attached to oxygen
 (B) The phenoxide ion is stabilised by resonance delocalisation of the negative charge into the benzene ring
 (C) Ethanol has a stronger $+I$ effect of the alkyl group which destabilises the anion
 (D) Phenol undergoes intramolecular hydrogen bonding which weakens the $O-H$ bond
+Why HARD: Student must compare resonance stabilisation of conjugate base (dominant effect) vs bond strength, inductive effect, and H-bonding (plausible but wrong). All 4 options invoke real chemistry effects.
 
 ════════════ TOPIC MAPPING (before writing questions) ════════════
 
