@@ -1093,22 +1093,41 @@ Multi-step calculation (2-3 steps). Options are 4 numerical values with units.
 Distractors = results of common student errors (forgot unit conversion, wrong formula, sign error).
 Only use when the PDF content has quantitative data.
 
-Example:
+Example (Colligative Properties):
 Q. 18 g of glucose (molar mass = 180 g/mol) is dissolved in 500 g of water. If $K_f$ = 1.86 K kg $mol^{{-1}}$, $\Delta T_f$ is:
 (A) 0.186 K  (B) 0.372 K  (C) 0.558 K  (D) 1.86 K
 (Trap: (A) = forgot g$\rightarrow$kg; (D) = used m=1 instead of 0.2)
+
+Example (Electrochemistry — Nernst Equation):
+Q. For the cell $Zn | Zn^{{2+}}(0.1 M) || Cu^{{2+}}(1.0 M) | Cu$, $E^\circ_{{cell}}$ = 1.10 V at 298 K. The $E_{{cell}}$ is: (Given: $\\frac{{2.303RT}}{{F}}$ = 0.059 V)
+(A) 1.07 V  (B) 1.13 V  (C) 1.10 V  (D) 1.16 V
+Answer: (B). Nernst: $E = E^\circ - \\frac{{0.059}}{{2}} \\log \\frac{{0.1}}{{1.0}}$ = 1.10 + 0.0295 = 1.13 V.
+(Trap: (A) = wrong sign in log term; (C) = forgot concentration correction; (D) = used n=1 instead of n=2)
+
+Example (Thermodynamics):
+Q. For a reaction with $\\Delta H$ = −57 kJ $mol^{{-1}}$ and $\\Delta S$ = −170 J $K^{{-1}} mol^{{-1}}$, the temperature above which the reaction becomes non-spontaneous is:
+(A) 335 K  (B) 298 K  (C) 170 K  (D) 57 K
+Answer: (A). At equilibrium $\\Delta G$ = 0: T = $\\frac{{\\Delta H}}{{\\Delta S}}$ = $\\frac{{57000}}{{170}}$ = 335 K. Above this, $T\\Delta S$ > $\\Delta H$, so $\\Delta G$ > 0.
+(Trap: (B) = assumed room temperature; (C) = used $\\Delta S$ directly; (D) = used $\\Delta H$ in kJ without converting)
 
 ──── G — CONCEPTUAL REASONING (deep WHY/HOW) ────
 
 Single deep question testing WHY or HOW something happens. Requires multi-step logic.
 Options are 4 SHORT answers (1 line each). All must sound plausible.
 
-Example:
+Example (Inorganic):
 Q. When NaCl is doped with $SrCl_2$, cation vacancies increase. The reason is:
 (A) $Sr^{{2+}}$ occupies an interstitial site, displacing two $Na^+$
 (B) Each $Sr^{{2+}}$ replaces one $Na^+$ and creates one cation vacancy for electrical neutrality
 (C) $Cl^-$ ions leave the lattice to balance the extra charge
 (D) $Sr^{{2+}}$ creates Schottky defects by removing cation-anion pairs
+
+Example (Organic — use when PDF has organic content):
+Q. Phenol is considerably more acidic than ethanol. The most appropriate reason is:
+(A) The $O-H$ bond in phenol is weaker due to the $sp^2$ carbon attached to oxygen
+(B) The phenoxide ion is stabilised by resonance delocalisation of the negative charge into the benzene ring
+(C) Ethanol has a stronger $+I$ effect of the alkyl group which destabilises the anion
+(D) Phenol undergoes intramolecular hydrogen bonding which weakens the $O-H$ bond
 
 ════════════ TOPIC MAPPING (before writing questions) ════════════
 
@@ -1124,6 +1143,44 @@ Q. When NaCl is doped with $SrCl_2$, cation vacancies increase. The reason is:
   BAD: Q1 "How many about Fe?", Q2 "How many about Cu?" — same structure, different element.
 - Cycle through categories: Q1=A, Q2=D, Q3=F, Q4=C, Q5=G, etc.
 - Each question must LOOK and FEEL different from every other question.
+
+════════════ NEET ≠ JEE LIMITER (CRITICAL) ════════════
+
+NEET Hard = Multi-step reasoning about mechanisms, competing effects, and conceptual depth.
+NOT: Quantum-level derivations, mathematical proofs, Olympiad-level edge cases, or JEE Advanced problems.
+BAD (too hard — beyond NEET scope):
+- "Calculate the Slater screening constant for 3d electrons in Cr"
+- "Derive the expression for crystal field splitting energy in an octahedral field"
+- "Find the pH of 0.1M $CH_3COOH$ buffer after adding 10 mL of 0.1M HCl to 100 mL buffer" ← multi-step buffer math, JEE level
+GOOD (NEET Hard):
+- Multi-statement evaluation with "because" reasoning
+- "How many are correct?" with plausible traps
+- Arrange in order of a property that requires understanding (not just recall)
+- Single deep WHY/HOW question with 4 plausible mechanistic answers
+- Numerical questions limited to 2-3 steps using standard NCERT formulas ($\\Delta T_f = K_f \\cdot m$, Nernst equation, $\\Delta G = \\Delta H - T\\Delta S$)
+If it requires mathematical derivation or data beyond NCERT $\rightarrow$ TOO HARD for NEET. Scale back.
+
+════════════ COMMON ACCURACY TRAPS (VERIFY BEFORE OUTPUT) ════════════
+
+Inorganic:
+- d-block: Remove electrons from 4s FIRST, then 3d ($Fe \\rightarrow Fe^{{2+}}$: lose $4s^2$ first $\\rightarrow 3d^6$)
+- Oxidation states: Mn in $KMnO_4$ = +7 (not +6), Cr in $K_2Cr_2O_7$ = +6 (not +7)
+- Coordination: $[Fe(CN)_6]^{{4-}}$ has $Fe^{{2+}}$ (not $Fe^{{3+}}$), $[Fe(CN)_6]^{{3-}}$ has $Fe^{{3+}}$
+- Magnetic behaviour: Depends on UNPAIRED electrons, not total d-electrons
+- Spin state: Strong field ligand = low spin (pair in $t_{{2g}}$), Weak field = high spin
+
+Physical Chemistry:
+- $\\Delta G = \\Delta H - T\\Delta S$: reaction can be endothermic yet spontaneous if $T\\Delta S > \\Delta H$
+- Colligative properties depend on NUMBER of particles — electrolytes give i × particles (van't Hoff factor)
+- Le Chatelier: Catalyst does NOT shift equilibrium, only increases rate
+- Adding inert gas at constant volume $\\rightarrow$ NO equilibrium shift
+- Nernst equation: n = number of electrons transferred, NOT number of moles of reactant
+
+Organic (when PDF has organic content):
+- SN1 = racemisation (planar carbocation), SN2 = inversion (backside attack)
+- Markovnikov: H adds to C with MORE hydrogens (more substituted carbocation is stable)
+- Anti-Markovnikov: ONLY with HBr + peroxide, NOT HCl or HI
+- Carbocation stability: 3° > 2° > 1° > methyl (hyperconjugation + inductive effect)
 
 ════════════ STATEMENT QUALITY (for categories A/B/C/E) ════════════
 
@@ -1670,19 +1727,29 @@ Answer: b — Copper is chosen for HIGH CONDUCTIVITY, not malleability. Many met
 TYPE 3 (Answer: c) — A true, R false:
 A correct BUT R has a subtle mechanistic error (misassigned mechanism, reversed cause-effect, wrong parent geometry).
 
-Example:
+Example (Inorganic):
 A: The bond angle in water is approximately 104.5°, less than the ideal tetrahedral angle.
 R: The two lone pairs on oxygen repel each other more strongly than bonding pairs, pushing the bond angle below 120° from the trigonal planar geometry.
 Answer: c — R is false. Parent geometry is TETRAHEDRAL (4 $e^-$ pairs), not trigonal planar. Angle compresses below 109.5°, not 120°.
+
+Example (Organic — when PDF has organic content):
+A: Aniline does not undergo Friedel-Crafts alkylation.
+R: The $-NH_2$ group in aniline is a strong deactivating group that makes the benzene ring electron-poor, preventing electrophilic attack.
+Answer: c — A is true (aniline doesn't undergo Friedel-Crafts). But R is false — $-NH_2$ is actually an ACTIVATING group (+M effect). The real reason is that the lone pair on nitrogen coordinates with the Lewis acid catalyst ($AlCl_3$), deactivating the catalyst, not the ring.
 
 
 TYPE 4 (Answer: d) — A false, R true:
 A has a subtle conceptual error (common misconception). R is mechanistically correct.
 
-Example:
+Example (Inorganic):
 A: Fluorine exhibits oxidation states of -1, 0, and +1, similar to other halogens.
 R: Fluorine is the most electronegative element and always attracts the shared electron pair towards itself.
 Answer: d — A is false. Unlike Cl/Br/I, fluorine NEVER shows positive oxidation states (no d-orbitals, highest EN). R explains why.
+
+Example (Physical Chemistry — when PDF has physical chemistry content):
+A: Adding a catalyst to a reversible reaction increases the yield of products at equilibrium.
+R: A catalyst lowers the activation energy by providing an alternative reaction pathway.
+Answer: d — A is false (catalyst speeds up BOTH forward and reverse equally, no change in equilibrium position). R is true — catalysts do lower $E_a$.
 
 
 ------------------------------------------------------------
@@ -1824,10 +1891,10 @@ C. [Formula/Term] | III. [Property/Name]
 D. [Formula/Term] | IV. [Property/Name]
 
 Options format (each option is a complete matching sequence):
-(1) A-IV, B-III, C-I, D-II
-(2) A-III, B-IV, C-II, D-I
-(3) A-I, B-II, C-IV, D-III
-(4) A-II, B-I, C-III, D-IV
+(a) A-IV, B-III, C-I, D-II
+(b) A-III, B-IV, C-II, D-I
+(c) A-I, B-II, C-IV, D-III
+(d) A-II, B-I, C-III, D-IV
 
 ------------------------------------------------------------
 SHUFFLE LIST II (CRITICAL — MOST COMMON BUG)
@@ -1843,7 +1910,7 @@ SELF-CHECK: Look at your correct option. If it reads A-I, B-II, C-III, D-IV $\ri
 ------------------------------------------------------------
 ALL 4 OPTIONS MUST BE UNIQUE (CRITICAL — INSTANT FAIL)
 
-Every option (1), (2), (3), (4) MUST be a DIFFERENT combination. If any two options are identical, the question is BROKEN.
+Every option (a), (b), (c), (d) MUST be a DIFFERENT combination. If any two options are identical, the question is BROKEN.
 
 HOW TO BUILD 4 UNIQUE OPTIONS:
 1. Start with the CORRECT matching (e.g., A-IV, B-I, C-III, D-II)
@@ -1851,18 +1918,18 @@ HOW TO BUILD 4 UNIQUE OPTIONS:
 3. VERIFY: Write out all 4 options and check character-by-character that no two are the same
 
 BAD (INSTANT FAIL):
-(1) A-III, B-II, C-IV, D-I
-(2) A-IV, B-I, C-III, D-II
-(3) A-III, B-II, C-IV, D-I  ← DUPLICATE of option (1)!
-(4) A-II, B-IV, C-I, D-III
+(a) A-III, B-II, C-IV, D-I
+(b) A-IV, B-I, C-III, D-II
+(c) A-III, B-II, C-IV, D-I  ← DUPLICATE of option (a)!
+(d) A-II, B-IV, C-I, D-III
 
 GOOD:
-(1) A-III, B-II, C-IV, D-I
-(2) A-IV, B-I, C-III, D-II
-(3) A-II, B-IV, C-I, D-III  ← unique
-(4) A-I, B-III, C-II, D-IV  ← unique
+(a) A-III, B-II, C-IV, D-I
+(b) A-IV, B-I, C-III, D-II
+(c) A-II, B-IV, C-I, D-III  ← unique
+(d) A-I, B-III, C-II, D-IV  ← unique
 
-BEFORE finalizing: Compare every pair of options $\rightarrow$ (1)vs(2), (1)vs(3), (1)vs(4), (2)vs(3), (2)vs(4), (3)vs(4). If ANY pair matches $\rightarrow$ change the duplicate.
+BEFORE finalizing: Compare every pair of options $\rightarrow$ (a)vs(b), (a)vs(c), (a)vs(d), (b)vs(c), (b)vs(d), (c)vs(d). If ANY pair matches $\rightarrow$ change the duplicate.
 
 ------------------------------------------------------------
 NO DUPLICATE VALUES IN LIST II (CRITICAL — INSTANT FAIL)
@@ -1982,11 +2049,11 @@ C. Gas with pungent smell | III. $S^{{2-}}$
 D. Brown fumes | IV. $SO_3^{{2-}}$
 
 Choose the correct answer from the options given below:
-(1) A-II, B-III, C-IV, D-I
-(2) A-IV, B-III, C-II, D-I
-(3) A-I, B-IV, C-III, D-II
-(4) A-II, B-I, C-IV, D-III
-Answer: (1) — Direct observation-to-anion matching. Each pair is one factual recall.
+(a) A-II, B-III, C-IV, D-I
+(b) A-IV, B-III, C-II, D-I
+(c) A-I, B-IV, C-III, D-II
+(d) A-II, B-I, C-IV, D-III
+Answer: (a) — Direct observation-to-anion matching. Each pair is one factual recall.
 
 Example 2 — Ore ↔ Metal (d-block):
 Match List I with List II
@@ -1998,17 +2065,17 @@ C. Malachite | III. Iron
 D. Cassiterite | IV. Tin
 
 Choose the correct answer from the options given below:
-(1) A-III, B-I, C-II, D-IV
-(2) A-I, B-III, C-IV, D-II
-(3) A-II, B-IV, C-I, D-III
-(4) A-IV, B-II, C-III, D-I
-Answer: (1) — One ore $\rightarrow$ one metal. Pure factual recall.
+(a) A-III, B-I, C-II, D-IV
+(b) A-I, B-III, C-IV, D-II
+(c) A-II, B-IV, C-I, D-III
+(d) A-IV, B-II, C-III, D-I
+Answer: (a) — One ore $\rightarrow$ one metal. Pure factual recall.
 
 BAD EXAMPLES (NEVER generate):
 - History/discovery matching: $NH_4CNO$ ↔ "Converted to urea by Wohler (1828)" — textbook trivia, NOT NEET
 - All 4 List II items same type (e.g., all electronic configurations) — monotonous
 - Self-evident matching: $[Co(NH_3)_6]^{{3+}}$ ↔ "Homoleptic complex" — visible from formula, no knowledge needed
-- Duplicate options: (1) and (3) identical — instant fail
+- Duplicate options: (a) and (c) identical — instant fail
 
 ------------------------------------------------------------
 ABSOLUTE BANS
@@ -2148,10 +2215,10 @@ C. [Compound/Reagent] | III. [Property/Outcome]
 D. [Compound/Reagent] | IV. [Property/Outcome]
 
 Options format:
-(1) A-IV, B-III, C-I, D-II
-(2) A-III, B-IV, C-II, D-I
-(3) A-I, B-II, C-IV, D-III
-(4) A-II, B-I, C-III, D-IV
+(a) A-IV, B-III, C-I, D-II
+(b) A-III, B-IV, C-II, D-I
+(c) A-I, B-II, C-IV, D-III
+(d) A-II, B-I, C-III, D-IV
 
 ------------------------------------------------------------
 SHUFFLE LIST II (CRITICAL — MOST COMMON BUG)
@@ -2170,14 +2237,14 @@ BAD: II. "Smaller than Mg but larger than $Al^{{3+}}$" AND IV. "Smaller than Mg 
 ------------------------------------------------------------
 ALL 4 OPTIONS MUST BE UNIQUE (CRITICAL — INSTANT FAIL)
 
-Every option (1), (2), (3), (4) MUST be a DIFFERENT combination. If any two options are identical, the question is BROKEN.
+Every option (a), (b), (c), (d) MUST be a DIFFERENT combination. If any two options are identical, the question is BROKEN.
 
 HOW TO BUILD 4 UNIQUE OPTIONS:
 1. Start with the CORRECT matching (e.g., A-IV, B-I, C-III, D-II)
 2. Create 3 WRONG options by swapping List II assignments — each swap must produce a DIFFERENT combination
 3. VERIFY: Write out all 4 options and check character-by-character that no two are the same
 
-BEFORE finalizing: Compare every pair $\rightarrow$ (1)vs(2), (1)vs(3), (1)vs(4), (2)vs(3), (2)vs(4), (3)vs(4). If ANY pair matches $\rightarrow$ change the duplicate.
+BEFORE finalizing: Compare every pair $\rightarrow$ (a)vs(b), (a)vs(c), (a)vs(d), (b)vs(c), (b)vs(d), (c)vs(d). If ANY pair matches $\rightarrow$ change the duplicate.
 
 ------------------------------------------------------------
 TOPIC DIVERSITY (MANDATORY WHEN GENERATING MULTIPLE QUESTIONS)
@@ -2247,11 +2314,11 @@ C. $H_2$ | III. 946.0
 D. $O_2$ | IV. 431.0
 
 Choose the correct answer from the options given below:
-(1) A-III, B-IV, C-I, D-II
-(2) A-IV, B-I, C-III, D-II
-(3) A-IV, B-III, C-II, D-I
-(4) A-IV, B-III, C-I, D-II
-Answer: (4) — Must know relative bond strengths: N≡N strongest (946), O=O (498), H-H (435.8), H-Cl (431).
+(a) A-III, B-IV, C-I, D-II
+(b) A-IV, B-I, C-III, D-II
+(c) A-IV, B-III, C-II, D-I
+(d) A-IV, B-III, C-I, D-II
+Answer: (d) — Must know relative bond strengths: N≡N strongest (946), O=O (498), H-H (435.8), H-Cl (431).
 Why MEDIUM: Student must rank bond strengths and assign numerical values — not just recall names.
 
 Example 2 — Trend ↔ Cause (Periodic Properties):
@@ -2264,11 +2331,11 @@ C. Electronegativity decreases down a group | III. Greater Zeff contracts the el
 D. Electron affinity becomes more negative across a period | IV. Stronger nuclear charge favours electron capture
 
 Choose the correct answer from the options given below:
-(1) A-II, B-III, C-I, D-IV
-(2) A-III, B-II, C-IV, D-I
-(3) A-I, B-IV, C-II, D-III
-(4) A-IV, B-I, C-III, D-II
-Answer: (1) — Must connect each trend to its correct cause. "Nuclear charge" appears in multiple List II items — student must distinguish the specific mechanism.
+(a) A-II, B-III, C-I, D-IV
+(b) A-III, B-II, C-IV, D-I
+(c) A-I, B-IV, C-II, D-III
+(d) A-IV, B-I, C-III, D-II
+Answer: (a) — Must connect each trend to its correct cause. "Nuclear charge" appears in multiple List II items — student must distinguish the specific mechanism.
 
 Example 3 — Compound ↔ Distinguishing property (d-block):
 Match List I with List II
@@ -2280,18 +2347,18 @@ C. $FeSO_4 \cdot 7H_2O$ | III. Orange crystals, used in breathalyser test
 D. $CuSO_4 \cdot 5H_2O$ | IV. Green vitriol, turns brown on exposure to air
 
 Choose the correct answer from the options given below:
-(1) A-II, B-III, C-IV, D-I
-(2) A-III, B-I, C-II, D-IV
-(3) A-IV, B-II, C-I, D-III
-(4) A-I, B-IV, C-III, D-II
-Answer: (1) — Not just name recall; student must connect each compound to its specific distinguishing behaviour.
+(a) A-II, B-III, C-IV, D-I
+(b) A-III, B-I, C-II, D-IV
+(c) A-IV, B-II, C-I, D-III
+(d) A-I, B-IV, C-III, D-II
+Answer: (a) — Not just name recall; student must connect each compound to its specific distinguishing behaviour.
 
 BAD EXAMPLES (NEVER generate for Medium):
 - Too Easy: HCl ↔ Hydrochloric acid (definition recall — belongs in Easy)
 - Too Easy: Fe ↔ $[Ar]3d^6 4s^2$ (pure config recall — belongs in Easy)
 - Too Hard: SN1/SN2/E1/E2 mechanism matching (deep mechanistic understanding — belongs in Hard)
 - Ambiguous: "Strong acid" / "HCl" / "Monoprotic acid" / "Mineral acid" — HCl is all of them
-- Duplicate options: (1) and (3) identical — instant fail
+- Duplicate options: (a) and (c) identical — instant fail
 - All same topic: 3 questions all matching element ↔ config — use different dimensions
 - DATA LOOKUP: "Table 4.2 value: Enthalpy of atomisation for V" ↔ "515 kJ $mol^{{-1}}$" ← just copying a number from a table, NO understanding. BANNED.
 - KEYWORD GIVEAWAY: If List I and List II share the same names/elements, the match is obvious without chemistry knowledge. BANNED.
@@ -2480,10 +2547,10 @@ C. [Condition/Process] | III. [Consequence/Outcome]
 D. [Condition/Process] | IV. [Consequence/Outcome]
 
 Options format:
-(1) A-IV, B-III, C-I, D-II
-(2) A-III, B-IV, C-II, D-I
-(3) A-I, B-II, C-IV, D-III
-(4) A-II, B-I, C-III, D-IV
+(a) A-IV, B-III, C-I, D-II
+(b) A-III, B-IV, C-II, D-I
+(c) A-I, B-II, C-IV, D-III
+(d) A-II, B-I, C-III, D-IV
 
 ------------------------------------------------------------
 SHUFFLE LIST II (CRITICAL — MOST COMMON BUG)
@@ -2502,14 +2569,14 @@ BAD: II. "Smaller than Mg but larger than $Al^{{3+}}$" AND IV. "Smaller than Mg 
 ------------------------------------------------------------
 ALL 4 OPTIONS MUST BE UNIQUE (CRITICAL — INSTANT FAIL)
 
-Every option (1), (2), (3), (4) MUST be a DIFFERENT combination. If any two options are identical, the question is BROKEN.
+Every option (a), (b), (c), (d) MUST be a DIFFERENT combination. If any two options are identical, the question is BROKEN.
 
 HOW TO BUILD 4 UNIQUE OPTIONS:
 1. Start with the CORRECT matching (e.g., A-IV, B-I, C-III, D-II)
 2. Create 3 WRONG options by swapping List II assignments — each swap should target the "confusable" pairs to create plausible traps
 3. VERIFY: Write out all 4 options and check character-by-character that no two are the same
 
-BEFORE finalizing: Compare every pair $\rightarrow$ (1)vs(2), (1)vs(3), (1)vs(4), (2)vs(3), (2)vs(4), (3)vs(4). If ANY pair matches $\rightarrow$ change the duplicate.
+BEFORE finalizing: Compare every pair $\rightarrow$ (a)vs(b), (a)vs(c), (a)vs(d), (b)vs(c), (b)vs(d), (c)vs(d). If ANY pair matches $\rightarrow$ change the duplicate.
 
 ------------------------------------------------------------
 TOPIC DIVERSITY (MANDATORY WHEN GENERATING MULTIPLE QUESTIONS)
@@ -2518,14 +2585,22 @@ When generating 2+ MTC Hard questions, each question MUST test a DIFFERENT conce
 Do NOT make all questions about the same topic (e.g., all about equilibrium or all about d-block properties).
 
 Pick from these NEET-relevant HARD matching dimensions (use different ones):
-- Condition change ↔ Equilibrium shift direction + reason
-- Reagent/Condition ↔ Specific mechanistic outcome (not just "reacts")
-- Structural feature ↔ Downstream physical/chemical consequence
-- Thermodynamic quantity ↔ Sign/magnitude with reasoning
-- Purification technique ↔ Specific mixture type + why that technique works
+
+Inorganic / Coordination:
 - Complex ion ↔ Magnetic/spectral property with d-electron reasoning
+- Structural feature ↔ Downstream physical/chemical consequence
 - Reaction condition ↔ Major vs minor product with selectivity reasoning
-- Electrode process ↔ Half-reaction + $E^\circ$ reasoning
+
+Physical Chemistry:
+- Condition change ↔ Equilibrium shift direction + reason (Le Chatelier reasoning)
+- Thermodynamic quantity ↔ Sign/magnitude with reasoning ($\\Delta G$, $\\Delta H$, $\\Delta S$ interplay)
+- Electrode process ↔ Half-reaction + $E^\\circ$ reasoning (Nernst equation application)
+- Purification technique ↔ Specific mixture type + why that technique works
+- Colligative property ↔ Specific calculation outcome (van't Hoff factor reasoning)
+
+Organic (when PDF has organic content):
+- Reagent/Condition ↔ Specific mechanistic outcome (SN1 vs SN2 vs E1 vs E2)
+- Substrate ↔ Major product with regio/stereoselectivity reasoning (Markovnikov, Saytzeff)
 
 ------------------------------------------------------------
 ANSWER ACCURACY VERIFICATION (CRITICAL — DO THIS BEFORE FINALIZING)
@@ -2583,11 +2658,11 @@ C. Fractions of crude oil | III. Distillation under reduced pressure
 D. Aniline + Water | IV. Distillation
 
 Choose the correct answer from the options given below:
-(1) A-III, B-IV, C-II, D-I
-(2) A-IV, B-III, C-I, D-II
-(3) A-I, B-II, C-III, D-IV
-(4) A-II, B-I, C-IV, D-III
-Answer: (1)
+(a) A-III, B-IV, C-II, D-I
+(b) A-IV, B-III, C-I, D-II
+(c) A-I, B-II, C-III, D-IV
+(d) A-II, B-I, C-IV, D-III
+Answer: (a)
 Reasoning chain per pair:
 - A$\rightarrow$III: Glycerol has high BP + decomposes on heating $\rightarrow$ must use reduced pressure
 - B$\rightarrow$IV: $CHCl_3$ (BP 61°C) and aniline (BP 184°C) have large BP gap $\rightarrow$ simple distillation
@@ -2605,11 +2680,11 @@ C. Increase pressure | III. Shifts toward reactants (backward)
 D. Remove $NH_3$ continuously | IV. Shifts forward — fewer gas moles on product side
 
 Choose the correct answer from the options given below:
-(1) A-III, B-II, C-IV, D-I
-(2) A-I, B-II, C-IV, D-III
-(3) A-II, B-III, C-I, D-IV
-(4) A-IV, B-I, C-III, D-II
-Answer: (1)
+(a) A-III, B-II, C-IV, D-I
+(b) A-I, B-II, C-IV, D-III
+(c) A-II, B-III, C-I, D-IV
+(d) A-IV, B-I, C-III, D-II
+Answer: (a)
 Reasoning chain per pair:
 - A$\rightarrow$III: Exothermic rxn + heat $\rightarrow$ Le Chatelier shifts backward to absorb heat
 - B$\rightarrow$II: Catalyst lowers Ea equally for both directions $\rightarrow$ rate up, no equilibrium shift
@@ -2627,11 +2702,11 @@ C. $[FeF_6]^{{3-}}$ | III. Paramagnetic with 1 unpaired electron
 D. $[CoF_6]^{{3-}}$ | IV. Paramagnetic with 4 unpaired electrons
 
 Choose the correct answer from the options given below:
-(1) A-II, B-III, C-I, D-IV
-(2) A-III, B-II, C-IV, D-I
-(3) A-I, B-IV, C-II, D-III
-(4) A-IV, B-I, C-III, D-II
-Answer: (1)
+(a) A-II, B-III, C-I, D-IV
+(b) A-III, B-II, C-IV, D-I
+(c) A-I, B-IV, C-II, D-III
+(d) A-IV, B-I, C-III, D-II
+Answer: (a)
 Reasoning chain per pair:
 - A$\rightarrow$II: $Fe^{{2+}}$ ($3d^6$) + $CN^-$ (strong field) $\rightarrow$ $t_{{2g}}^6 e_g^0$ $\rightarrow$ 0 unpaired $\rightarrow$ diamagnetic
 - B$\rightarrow$III: $Fe^{{3+}}$ ($3d^5$) + $CN^-$ (strong field) $\rightarrow$ $t_{{2g}}^5 e_g^0$ $\rightarrow$ 1 unpaired $\rightarrow$ paramagnetic
@@ -2643,7 +2718,7 @@ BAD EXAMPLES (NEVER generate):
 - Too Easy: Formula ↔ Name matching (belongs in Easy)
 - Too Medium: Reagent ↔ Single functional role with no multi-step reasoning
 - Wrong answer: $Fe^{{2+}}$ has $3d^6$ not $3d^8$ — always verify d-electron count
-- Duplicate options: (1) and (3) have same matching — instant fail
+- Duplicate options: (a) and (c) have same matching — instant fail
 - All same topic: 3 questions all about equilibrium shifts — use different systems
 
 ------------------------------------------------------------
