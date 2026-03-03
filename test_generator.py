@@ -17,7 +17,6 @@ from concurrent.futures import ThreadPoolExecutor
 from openai import OpenAI
 from pypdf import PdfReader, PdfWriter
 
-import prompts_biology
 import prompts_chemistry
 
 logger = logging.getLogger(__name__)
@@ -394,9 +393,7 @@ def _randomize_answer_positions(questions: list) -> list:
 
 def _get_prompt_module(subject: str):
     """Return the correct prompts module based on the subject."""
-    if subject.lower().strip() == "chemistry":
-        return prompts_chemistry
-    return prompts_biology
+    return prompts_chemistry
 
 
 # ============================================================
@@ -661,7 +658,7 @@ def generate_neet_test_from_pdf(
     question_type: str = "mcq",
     model: str = "gpt-5-mini",
     temperature: float = 1.0,
-    max_completion_tokens: int = 70000,
+    max_completion_tokens: int = 90000,
     api_key: str = None,
 ) -> dict:
     """
@@ -725,10 +722,11 @@ def generate_neet_test_from_pdf(
 
             # Build instruction for this chunk
             chunk_instruction = (
-                f"Generate {chunk_q} {difficulty} {effective_type.replace('_', ' ')} questions "
-                f"from this textbook PDF. Each question MUST test a COMPLETELY DIFFERENT concept — "
+                f"YOU MUST generate EXACTLY {chunk_q} {difficulty} {effective_type.replace('_', ' ')} questions. "
+                f"Do NOT stop before reaching {chunk_q} questions. Do not stop early.\n\n"
+                f"Each question MUST test a COMPLETELY DIFFERENT concept — "
                 "no two questions can cover the same topic, fact, or principle even if rephrased.\n\n"
-                "ACCURACY IS #1 PRIORITY — every correct_answer MUST match the PDF. If unsure, skip that question.\n\n"
+                "ACCURACY IS #1 PRIORITY — every correct_answer MUST match the PDF. If unsure, skip that question and replace it with another.\n\n"
                 f"CORE PAGES (generate questions ONLY from these): pages {core_start+1}-{core_end+1}.\n"
                 f"{context_note}\n"
                 "RULES:\n"
@@ -787,10 +785,11 @@ def generate_neet_test_from_pdf(
         formatted_prompt = prompt_module.get_prompt(effective_type, difficulty, subject, question_count)
 
         user_instruction = (
-            f"Generate {question_count} {difficulty} {effective_type.replace('_', ' ')} questions "
-            f"from this textbook PDF. Each question MUST test a COMPLETELY DIFFERENT concept — "
+            f"YOU MUST generate EXACTLY {question_count} {difficulty} {effective_type.replace('_', ' ')} questions. "
+            f"Do NOT stop before reaching {question_count} questions. Do not stop early.\n\n"
+            f"Each question MUST test a COMPLETELY DIFFERENT concept — "
             "no two questions can cover the same topic, fact, or principle even if rephrased.\n\n"
-            "ACCURACY IS #1 PRIORITY — every correct_answer MUST match the PDF. If unsure, skip that question.\n\n"
+            "ACCURACY IS #1 PRIORITY — every correct_answer MUST match the PDF. If unsure, skip that question and replace it with another.\n\n"
             "RULES:\n"
             "- Each question tests a DIFFERENT concept from a DIFFERENT page/section.\n"
             "- Spread across ALL pages — first third, middle third, last third.\n"

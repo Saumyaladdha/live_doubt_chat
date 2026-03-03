@@ -391,13 +391,13 @@ if "generating" not in st.session_state:
 if "gen_slot_idx" not in st.session_state:
     st.session_state.gen_slot_idx = 0  # Index of next slot to process
 if "gen_subject" not in st.session_state:
-    st.session_state.gen_subject = "biology"  # Subject captured at generation start
+    st.session_state.gen_subject = "chemistry"  # Subject captured at generation start
 if "gen_errors" not in st.session_state:
     st.session_state.gen_errors = {}  # {slot_id: error_message}
 # Load API key from environment variable
 api_key = os.getenv("OPENAI_API_KEY")
 model = "gpt-5-mini"
-max_completion_tokens = 80000
+max_completion_tokens = 127000  # gpt-5-mini max output tokens
 
 
 # ============================================================
@@ -786,12 +786,7 @@ with st.sidebar:
     st.divider()
     st.markdown('<div class="sidebar-section">Global Settings</div>', unsafe_allow_html=True)
 
-    subject = st.selectbox(
-        "Subject",
-        ["biology", "chemistry"],
-        index=0,
-        format_func=lambda x: x.title()
-    )
+    subject = "chemistry"
 
 
 # ============================================================
